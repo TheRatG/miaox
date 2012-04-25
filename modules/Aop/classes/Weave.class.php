@@ -286,7 +286,7 @@ class Miaox_Aop_Weave
 		else if ( is_string( $item ) && is_file( $item ) )
 		{
 			// Load the Aspect
-			$aspect = & Aop_Aspect::from( $item );
+			$aspect = Miaox_Aop_Aspect::from( $item );
 
 			// Insert the Aspect into Weave
 			$this->addAspect( $aspect );

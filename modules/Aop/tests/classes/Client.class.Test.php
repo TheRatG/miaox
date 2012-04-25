@@ -11,12 +11,17 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 		$this->_aop_source_path = $uniora_modules_root . '/modules/Aop/tests/sources';
 		$this->_aop_obj = new Miaox_Aop_Client();
 		$this->_path_tmp = $uniora_modules_root . '/tmp';
+
+		if ( !file_exists( $this->_path_tmp ) )
+		{
+			mkdir( $this->_path_tmp );
+		}
 	}
 
 	public function tearDown()
 	{
 		$path = $this->_path_tmp . '/AopSkeleton*';
-		shell_exec( sprintf( 'rm -rf %s', $path ) );
+		//shell_exec( sprintf( 'rm -rf %s', $path ) );
 	}
 
 	public function testBeforeAfterAll()
@@ -168,7 +173,7 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 
 		$skeleton_text = file_get_contents( $this->_aop_source_path . '/AopSkeleton.class.php' );
 		$skeleton_text = str_replace( 'class Miaox_AopSkeleton', 'class ' . $new_class_name, $skeleton_text );
-		file_put_contents( $this->_path_tmp . $new_class_name . '.class.php', $skeleton_text );
+		file_put_contents( $this->_path_tmp . '/' . $new_class_name . '.class.php', $skeleton_text );
 
 		return $new_class_name;
 	}

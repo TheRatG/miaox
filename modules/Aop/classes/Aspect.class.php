@@ -79,7 +79,7 @@ class Miaox_Aop_Aspect
 
 		if ( !array_key_exists( $hash, $_instances ) )
 		{
-			$_instances[ $hash ] = new Aop_Aspect( $xmlFile, $lazyInit );
+			$_instances[ $hash ] = new Miaox_Aop_Aspect( $xmlFile, $lazyInit );
 		}
 
 		return $_instances[ $hash ];

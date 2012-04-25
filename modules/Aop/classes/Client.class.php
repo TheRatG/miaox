@@ -174,7 +174,7 @@ class Miaox_Aop_Client
 			$weave = new Miaox_Aop_Weave( $weave );
 		}
 
-		$dir = Miaox_Aop_Directory::getCacheDirName( $filePath, $this->_cache );
+		$dir = Miaox_Aop_Directory2::getCacheDirName( $filePath, $this->_cache );
 
 		// Retrieving information
 		// Defining Last Modified Date
@@ -316,7 +316,7 @@ class Miaox_Aop_Client
 				$dir = $config[ 'cache_dir' ];
 				if ( !file_exists( $dir ) || !is_dir( $dir ) || !is_writeable( $dir ) )
 				{
-					throw new Exception( sprintf( 'Invalid path %s or not writeable', $dir ) );
+					throw new Exception( sprintf( 'Invalid path %s: dir doesn\'t exists or not writeable', $dir ) );
 				}
 				$this->setCacheDirectory( $dir );
 			}
