@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!DOCTYPE aspect SYSTEM "aop.dtd">
+<aspect>
+	<pointcut name="CustomPointcut_Pointcut1"><![CDATA[
+		$k = 0;
+	]]></pointcut>
+	<pointcut auto="after" function="show1" class="AopSkeletonNameFunctionClass"><![CDATA[
+		echo $k;
+	]]></pointcut>
+	<pointcut name="CustomPointcut_Pointcut1" function="show3" class="AopSkeletonNameFunctionClass"><![CDATA[
+		if ($k == 0 && $x < 0)
+		{
+			$x = 0;
+		}
+		else
+		{
+			$x = 3;
+		}
+	]]></pointcut>	
+	<pointcut name="CustomPointcut_PointcutIf" function="show3" class="AopSkeletonNameFunctionClass"><![CDATA[
+		return $x + 1;
+	]]></pointcut>
+	<pointcut name="CustomPointcut_Pointcut2" function="show3" class="AopSkeletonNameFunctionClass"><![CDATA[
+		if ($x == 0)
+		{
+			return $x - 1;
+		}
+	]]></pointcut>
+	<pointcut auto="after" function="show3" class="AopSkeletonNameFunctionClass"><![CDATA[
+		$x += 10;
+	]]></pointcut>
+</aspect>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!DOCTYPE aspect SYSTEM "aop.dtd">
+<aspect>
+	<pointcut auto="around" function="show3" class="AopSkeletonAroundFunctionClass"><![CDATA[
+		$x++;
+	]]></pointcut>
+	<pointcut auto="around" function="show1" class="AopSkeletonAroundFunctionClass"><![CDATA[
+		if ($k > 2)
+		{
+			proceed();
+		}
+		else
+		{
+			echo '<2';
+		}
+	]]></pointcut>
+</aspect>

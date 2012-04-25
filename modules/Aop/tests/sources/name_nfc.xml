@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!DOCTYPE aspect SYSTEM "aop.dtd">
+<aspect>
+	<pointcut name="CustomPointcut_Pointcut1" nfunction="show1" class="AopSkeletonNameNotFunctionClass"><![CDATA[
+		echo '1';
+	]]></pointcut>
+	<pointcut name="CustomPointcut_Pointcut1" function="show1" nclass="AopSkeletonNameNotFunctionClass"><![CDATA[
+		echo 'x';
+	]]></pointcut>
+	<pointcut name="CustomPointcut_Pointcut1" nfunction="show1"><![CDATA[
+		echo 'y';
+	]]></pointcut>	
+	<pointcut name="CustomPointcut_Pointcut1" nfunction="show1" nclass="AopSkeletonNameNotFunctionClass"><![CDATA[
+		echo 'z';
+	]]></pointcut>
+</aspect>
