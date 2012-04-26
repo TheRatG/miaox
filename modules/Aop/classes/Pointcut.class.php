@@ -6,6 +6,7 @@
 
 /**
  * Класс описывает срез
+ *
  * @package Tools
  * @subpackage Tools_Aop
  */
@@ -43,29 +44,34 @@ class Miaox_Aop_Pointcut
 	protected $_advice;
 
 	/**
+	 *
 	 * @param Miaox_Aop_Advice $advice
-	 * @param string|array $class список классов, включаемых в срез
-	 * @param string|array $function список функций/методов, включаемых в срез
-	 * @param string|array $nclass список классов, НЕ включаемых в срез
-	 * @param string|array $nfunction список функций/методов, НЕ включаемых в срез
+	 * @param string|array $class
+	 *        	список классов, включаемых в срез
+	 * @param string|array $function
+	 *        	список функций/методов, включаемых в срез
+	 * @param string|array $nclass
+	 *        	список классов, НЕ включаемых в срез
+	 * @param string|array $nfunction
+	 *        	список функций/методов, НЕ включаемых в срез
 	 */
-    public function __construct( Miaox_Aop_Advice $advice, $class, $function, $nclass, $nfunction )
-    {
-    	// Defining Class( es )
-		$this->_className = ( is_array( $class ) ? $class : split( ",[ ]*", $class ) );
+	public function __construct( Miaox_Aop_Advice $advice, $class, $function, $nclass, $nfunction )
+	{
+		// Defining Class( es )
+		$this->_className = $this->_extractAr( $class );
 
 		// Defining Not In Class( es )
-        $this->_notInClassName = ( is_array( $nclass ) ? $nclass : split( ",[ ]*", $nclass ) );
+		$this->_notInClassName = $this->_extractAr( $nclass );
 
-        // Defining Function( s )
-		$this->_functionName = ( is_array( $function ) ? $function : split( ",[ ]*", $function ) );
+		// Defining Function( s )
+		$this->_functionName = $this->_extractAr( $function );
 
-        // Defining Not In Function( s )
-		$this->_notInFunctionName = ( is_array( $nfunction ) ? $nfunction : split( ",[ ]*", $nfunction ) );
+		// Defining Not In Function( s )
+		$this->_notInFunctionName = $this->_extractAr( $nfunction );
 
-    	// Remove start/end carriage return chars in the code
-    	$this->_advice = $advice;
-    }
+		// Remove start/end carriage return chars in the code
+		$this->_advice = $advice;
+	}
 
 	/**
 	 * getter $this->_className
@@ -78,6 +84,7 @@ class Miaox_Aop_Pointcut
 	}
 
 	/**
+	 *
 	 * @param string $v
 	 * @return boolean
 	 */
@@ -97,6 +104,7 @@ class Miaox_Aop_Pointcut
 	}
 
 	/**
+	 *
 	 * @param string $v
 	 * @return boolean
 	 */
@@ -106,6 +114,7 @@ class Miaox_Aop_Pointcut
 	}
 
 	/**
+	 *
 	 * @return array
 	 */
 	public function getNotInClassName()
@@ -114,6 +123,7 @@ class Miaox_Aop_Pointcut
 	}
 
 	/**
+	 *
 	 * @param string $v
 	 * @return boolean
 	 */
@@ -123,6 +133,7 @@ class Miaox_Aop_Pointcut
 	}
 
 	/**
+	 *
 	 * @return array
 	 */
 	public function getNotInFunctionName()
@@ -131,6 +142,7 @@ class Miaox_Aop_Pointcut
 	}
 
 	/**
+	 *
 	 * @param string $v
 	 * @return boolean
 	 */
@@ -144,8 +156,19 @@ class Miaox_Aop_Pointcut
 	 *
 	 * @return Miaox_Aop_Advice
 	 */
-	public function & getAdvice()
+	public function &getAdvice()
 	{
 		return $this->_advice;
+	}
+
+	protected function _extractAr( $string )
+	{
+		$result = $string;
+		if ( !is_array( $string ) )
+		{
+			$result = explode( ',', $string );
+			$result = array_map( 'trim', $result );
+		}
+		return $result;
 	}
 }

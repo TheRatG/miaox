@@ -21,7 +21,7 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 	public function tearDown()
 	{
 		$path = $this->_path_tmp . '/AopSkeleton*';
-		//shell_exec( sprintf( 'rm -rf %s', $path ) );
+		// shell_exec( sprintf( 'rm -rf %s', $path ) );
 	}
 
 	public function testBeforeAfterAll()
@@ -39,10 +39,10 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals( $res, '13-113-123' );
 	}
 
-	public function atestBeforeAfterFunctionClass()
+	public function testBeforeAfterFunctionClass()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( Uniora_Core::buildPath( $this->_path_tmp, $class_name . '.class.php' ), Uniora_Core::buildPath( $this->_aop_source_path, 'before_after_fc.xml' ) );
+		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/before_after_fc.xml' );
 
 		ob_start();
 		$aoped_obj = new $class_name();
@@ -54,10 +54,10 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals( $res, '-11-23' );
 	}
 
-	public function atestAroundAll()
+	public function testAroundAll()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( Uniora_Core::buildPath( $this->_path_tmp, $class_name . '.class.php' ), Uniora_Core::buildPath( $this->_aop_source_path, 'around_all.xml' ) );
+		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/around_all.xml' );
 
 		ob_start();
 		$aoped_obj = new $class_name();
@@ -71,10 +71,10 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals( $res, '11+111+11-k-1+121' );
 	}
 
-	public function atestAroundFunctionClass()
+	public function testAroundFunctionClass()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( Uniora_Core::buildPath( $this->_path_tmp, $class_name . '.class.php' ), Uniora_Core::buildPath( $this->_aop_source_path, 'around_fc.xml' ) );
+		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/around_fc.xml' );
 
 		$aoped_obj = new $class_name();
 
@@ -92,10 +92,10 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals( $res, 1 );
 	}
 
-	public function atestNameAll()
+	public function testNameAll()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( Uniora_Core::buildPath( $this->_path_tmp, $class_name . '.class.php' ), Uniora_Core::buildPath( $this->_aop_source_path, 'name_all.xml' ) );
+		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/name_all.xml' );
 
 		$aoped_obj = new $class_name();
 
@@ -109,10 +109,10 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals( $res, '11+111-k-+12' );
 	}
 
-	public function atestNameFunctionClass()
+	public function testNameFunctionClass()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( Uniora_Core::buildPath( $this->_path_tmp, $class_name . '.class.php' ), Uniora_Core::buildPath( $this->_aop_source_path, 'name_fc.xml' ) );
+		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/name_fc.xml' );
 
 		$aoped_obj = new $class_name();
 
@@ -128,10 +128,10 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals( $res, 9 );
 	}
 
-	public function atestNameNotFunctionClass()
+	public function testNameNotFunctionClass()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( Uniora_Core::buildPath( $this->_path_tmp, $class_name . '.class.php' ), Uniora_Core::buildPath( $this->_aop_source_path, 'name_nfc.xml' ) );
+		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/name_nfc.xml' );
 		$class_name2 = $class_name . 'Second';
 
 		$aoped_obj = new $class_name();
@@ -149,12 +149,12 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals( $res, '1+1y2+4x+3yz' );
 	}
 
-	public function atestDoubleXml()
+	public function testDoubleXml()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( Uniora_Core::buildPath( $this->_path_tmp, $class_name . '.class.php' ), array(
-			Uniora_Core::buildPath( $this->_aop_source_path, 'name_double1.xml' ),
-			Uniora_Core::buildPath( $this->_aop_source_path, 'name_double2.xml' ) ) );
+		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', array(
+			$this->_aop_source_path . '/name_double1.xml',
+			$this->_aop_source_path . '/name_double2.xml' ) );
 
 		$aoped_obj = new $class_name();
 

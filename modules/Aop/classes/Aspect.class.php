@@ -349,7 +349,9 @@ class Miaox_Aop_Aspect
 					{
 						$a = $pointcut->getAdvice();
 
-						eregi( "(.*)[\t\s \n ]proceed\(\);(.*)", $a->getData(), $data );
+						//eregi( "(.*)[\t\s \n ]proceed\(\);(.*)", $a->getData(), $data );
+						$data = explode( 'proceed();', $a->getData() );
+						array_unshift( $data, $a->getData() );
 
 						if ( $autoPointcut == "before" )
 						{

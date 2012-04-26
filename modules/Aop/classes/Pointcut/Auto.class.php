@@ -35,7 +35,7 @@ class Miaox_Aop_Pointcut_Auto extends Miaox_Aop_Pointcut
 		parent::__construct( $action, $class, $function, $nclass, $nfunction );
 
 		// Defining Auto( s )
-		$this->_auto = ( is_array( $auto ) ? $auto : split( ",[ ]*", $auto ) );
+		$this->_auto =  $this->_extractAr( $auto );
 	}
 
 

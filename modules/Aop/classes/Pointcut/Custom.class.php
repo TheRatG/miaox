@@ -34,7 +34,7 @@ class Miaox_Aop_Pointcut_Custom extends Miaox_Aop_Pointcut
 		parent::__construct( $action, $class, $function, $nclass, $nfunction );
 
 		// Defining Name( s )
-		$this->_name = ( is_array( $name ) ? $name : split( ",[ ]*", $name ) );
+		$this->_name = $this->_extractAr( $name );
 	}
 
 	/**
