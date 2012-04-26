@@ -38,18 +38,18 @@ class Miaox_Aop_Pointcut
 	/**
 	 * Методы, применяемые к срезу
 	 *
-	 * @var Aop_Advice
+	 * @var Miaox_Aop_Advice
 	 */
 	protected $_advice;
 
 	/**
-	 * @param Aop_Advice $advice
+	 * @param Miaox_Aop_Advice $advice
 	 * @param string|array $class список классов, включаемых в срез
 	 * @param string|array $function список функций/методов, включаемых в срез
 	 * @param string|array $nclass список классов, НЕ включаемых в срез
 	 * @param string|array $nfunction список функций/методов, НЕ включаемых в срез
 	 */
-    public function __construct( Aop_Advice $advice, $class, $function, $nclass, $nfunction )
+    public function __construct( Miaox_Aop_Advice $advice, $class, $function, $nclass, $nfunction )
     {
     	// Defining Class( es )
 		$this->_className = ( is_array( $class ) ? $class : split( ",[ ]*", $class ) );
@@ -142,7 +142,7 @@ class Miaox_Aop_Pointcut
 	/**
 	 * Возвращает advice для данного среза
 	 *
-	 * @return Aop_Advice
+	 * @return Miaox_Aop_Advice
 	 */
 	public function & getAdvice()
 	{

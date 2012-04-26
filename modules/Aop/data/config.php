@@ -1,6 +1,7 @@
 <?php
 return array(
-	'cache_dir' => '/www/miaox.git/tmp/aop_cache_dir',
-	'recompile' => '0',
-	'encoding' => 'utf-8',
-	'compact' => '1' );
+	'Aop' => array(
+		'cache_dir' => '/www/miaox.git/tmp/aop_cache_dir',
+		'recompile' => '0',
+		'encoding' => 'utf-8',
+		'compact' => '1' ) );

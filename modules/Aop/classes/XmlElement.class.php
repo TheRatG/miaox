@@ -68,7 +68,7 @@ class Miaox_Aop_XmlElement
 	}
 
 	/**
-	 * @param Aop_XmlElement $parent
+	 * @param Miaox_Aop_XmlElement $parent
 	 */
 	public function setParentNode( &$parent )
 	{
@@ -76,7 +76,7 @@ class Miaox_Aop_XmlElement
 	}
 
 	/**
-	 * @return Aop_XmlElement
+	 * @return Miaox_Aop_XmlElement
 	 */
 	public function & getParentNode()
 	{
@@ -155,7 +155,7 @@ class Miaox_Aop_XmlElement
 	}
 
 	/**
-	 * @param Aop_XmlElement $node
+	 * @param Miaox_Aop_XmlElement $node
 	 */
 	public function addChildNode( &$node )
 	{
@@ -164,7 +164,7 @@ class Miaox_Aop_XmlElement
 
 	/**
 	 * @param integer $i
-	 * @return Aop_XmlElement
+	 * @return Miaox_Aop_XmlElement
 	 */
 	public function & getChildNode( $i )
 	{

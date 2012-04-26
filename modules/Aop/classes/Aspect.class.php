@@ -39,7 +39,7 @@ class Miaox_Aop_Aspect
 	protected  $_pointcuts;
 
 	/**
-	 *  Конструктор класса Aop_Aspect
+	 *  Конструктор класса Miaox_Aop_Aspect
 	 *
 	 * @param string $xmlFile путь к файлу
 	 * @param boolean $lazyInit do use lazy init
@@ -65,7 +65,7 @@ class Miaox_Aop_Aspect
 	 *
 	 * @param str $xmlFile путь к файлу
 	 * @param boolean $lazyInit разрешить ленивую инициализацию
-	 * @return Aop_Aspect
+	 * @return Miaox_Aop_Aspect
 	 */
 	public static function & from( $xmlFile, $lazyInit = true )
 	{
@@ -88,7 +88,7 @@ class Miaox_Aop_Aspect
 	/**
 	 * Добавить срез
 	 *
-	 * @param Aop_Pointcut $pointcut
+	 * @param Miaox_Aop_Pointcut $pointcut
 	 */
 	public function addPointcut( &$pointcut )
 	{
@@ -99,7 +99,7 @@ class Miaox_Aop_Aspect
 	 * Возвращает один срез с индексом $i
 	 *
 	 * @param int $i индекс в $this->pointcuts
-	 * @return Aop_Pointcut
+	 * @return Miaox_Aop_Pointcut
 	 */
 	public function & getPointcut( $i )
 	{
@@ -170,7 +170,7 @@ class Miaox_Aop_Aspect
 		// Checking if file exists
 		if ( !file_exists( $this->_xmlFile ) )
 		{
-			throw new Aop_Exception(
+			throw new Miaox_Aop_Exception(
 				"<b>[ Aspect Error ]:</b> File <b>" . $this->_xmlFile . "</b> does not exist!" );
 		}
 
@@ -178,7 +178,7 @@ class Miaox_Aop_Aspect
 		$fContent = implode( "", file( $this->_xmlFile ) );
 
 		// Parse XML file into an array map
-		$xmlReader = Aop_XmlReader::fromString( $fContent );
+		$xmlReader = Miaox_Aop_XmlReader::fromString( $fContent );
 
 		// Solve Advice src directory reference. Changes actual working directory
 		$oldWorkDir = getcwd();
@@ -198,7 +198,7 @@ class Miaox_Aop_Aspect
 					$nfunction = ( $v->getAttribute( "nfunction" ) === null ) ? "" : $v->getAttribute( "nfunction" );
 
 					// Implement some advice code creation via appending fragments
-					$advice = new Aop_Advice();
+					$advice = new Miaox_Aop_Advice();
 
 					foreach ( $v->getChildNodes() as $c => $a )
 					{
@@ -243,7 +243,7 @@ class Miaox_Aop_Aspect
 							}
 							else
 							{
-                                throw new Aop_Exception(
+                                throw new Miaox_Aop_Exception(
 									"<b>[ Aspect Error ]:</b> Undefined value <b>" . $asRequire . "</b> for advice tag!" );
 							}
 						}
@@ -258,11 +258,11 @@ class Miaox_Aop_Aspect
 					// Appending AutoPointcut or CustomPointcut to PointcutList
 					if ( $v->getAttribute( "name" ) === null && $v->getAttribute( "auto" ) !== null )
 					{
-                    	$this->addPointcut( new Aop_Pointcut_Auto( $advice, $class, $function, $v->getAttribute( "auto" ), $nclass, $nfunction ) );
+                    	$this->addPointcut( new Miaox_Aop_Pointcut_Auto( $advice, $class, $function, $v->getAttribute( "auto" ), $nclass, $nfunction ) );
 					}
 					else if ( $v->getAttribute( "name" ) !== null && $v->getAttribute( "auto" ) === null )
 					{
-                    	$this->addPointcut( new Aop_Pointcut_Custom( $advice, $class, $function, $v->getAttribute( "name" ), $nclass, $nfunction ) );
+                    	$this->addPointcut( new Miaox_Aop_Pointcut_Custom( $advice, $class, $function, $v->getAttribute( "name" ), $nclass, $nfunction ) );
 					}
 				}
 			}
@@ -282,11 +282,11 @@ class Miaox_Aop_Aspect
 	 * @param string $className имя класса -- фильтр для среза
 	 * @param string $functionName имя функции -- фильтр для среза
 	 * @param string $pointcutName имя среза -- фильтр
-	 * @return Aop_Advice
+	 * @return Miaox_Aop_Advice
 	 */
 	public function & getAdviceFromCustomPointcut( $className, $functionName, $pointcutName )
 	{
-		$advice = new Aop_Advice();
+		$advice = new Miaox_Aop_Advice();
 
 		$pointcuts = & $this->getPointcuts();
 		$l = count( $pointcuts );
@@ -295,7 +295,7 @@ class Miaox_Aop_Aspect
 		{
 			$pointcut = & $pointcuts[ $i ];
 
-			if ( $pointcut instanceof Aop_Pointcut_Custom &&
+			if ( $pointcut instanceof Miaox_Aop_Pointcut_Custom &&
 			    ( $pointcut->hasClassName( $className ) || $pointcut->hasClassName( "" ) ) &&
 				( $pointcut->hasFunctionName( $functionName ) || $pointcut->hasFunctionName( "" ) ) &&
 				$pointcut->hasName( $pointcutName ) )
@@ -321,11 +321,11 @@ class Miaox_Aop_Aspect
 	 * @param string $className имя класса -- фильтр для среза
 	 * @param string $functionName имя функции -- фильтр для среза
 	 * @param string $autoPointcut значение из набора ( before|after|around ) -- фильтр
-	 * @return Aop_Advice
+	 * @return Miaox_Aop_Advice
 	 */
 	public function & getAdviceFromAutoPointcut( $className, $functionName, $autoPointcut )
 	{
-		$advice = new Aop_Advice();
+		$advice = new Miaox_Aop_Advice();
 
 		$pointcuts = & $this->getPointcuts();
 		$l = count( $pointcuts );
@@ -333,7 +333,7 @@ class Miaox_Aop_Aspect
 		for ( $i = 0; $i < $l; $i++ )
 		{
 			$pointcut = & $pointcuts[ $i ];
-			if ( $pointcut instanceof Aop_Pointcut_Auto &&
+			if ( $pointcut instanceof Miaox_Aop_Pointcut_Auto &&
 			    ( $pointcut->hasClassName( $className ) || $pointcut->hasClassName( "" ) ) &&
 				( $pointcut->hasFunctionName( $functionName ) || $pointcut->hasFunctionName( "" ) ) )
 			{
@@ -374,17 +374,17 @@ class Miaox_Aop_Aspect
 	/**
 	 * Проверка на наличие одинаковых значенией в фильтрах class, nclass и function, nfunction
 	 *
-	 * @param Aop_Pointcut $pointcut
+	 * @param Miaox_Aop_Pointcut $pointcut
 	 * @param string $className имя класса, для class, nclass
 	 * @param string $functionName имя функции, для function, nfunction
-	 * @exception Aop_Exception
+	 * @exception Miaox_Aop_Exception
 	 */
 	protected function _checkForAttrMatching( &$pointcut, $className, $functionName )
 	{
     	// Need to check if there are a matching between class and nclass. Also, nfunction and function
 		if ( $className && $pointcut->hasClassName( $className ) && $pointcut->hasNotInClassName( $className ) )
 		{
-			throw new Aop_Exception(
+			throw new Miaox_Aop_Exception(
 				"<b>[ Aspect Error ]:</b> Cannot define a pointcut with the same class name [<b>".$className."</b>] in \"class\" and \"nclass\" attribute" );
 		}
 		else if (
@@ -392,7 +392,7 @@ class Miaox_Aop_Aspect
 			&& $pointcut->hasFunctionName( $functionName )
 			&& $pointcut->hasNotInFunctionName( $functionName ) )
 		{
-			throw new Aop_Exception(
+			throw new Miaox_Aop_Exception(
 				"<b>[ Aspect Error ]:</b> Cannot define a pointcut with the same function name [<b>".$functionName."</b>] in \"function\" and \"nfunction\" attribute" );
 		} // Does nothing if no match is found!
 	}

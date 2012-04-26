@@ -6,7 +6,7 @@
 
 /**
  * Класс для работы с дирректориями для хранения файлов классов, сгенерированных
- * Aop.
+ * Miaox_Aop.
  * Генерирует относительные пути для сгенерированных класов, аналогичные путям к
  * файлу внутри проекта
  *
@@ -70,7 +70,7 @@ class Miaox_Aop_File
 	 *        	существует, генериться exception
 	 * @param string $path
 	 *        	относительный путь к файлу класса
-	 * @return unknown @exception Aop_Exception
+	 * @return unknown @exception Miaox_Aop_Exception
 	 */
 	public static function checkDir( $dir )
 	{

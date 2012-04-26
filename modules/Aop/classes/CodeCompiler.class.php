@@ -22,7 +22,7 @@ class Miaox_Aop_CodeCompiler
     /**
      * Code Parser
      *
-     * @var Aop_CodeParser
+     * @var Miaox_Aop_CodeParser
      */
 	protected $_codeParser;
 
@@ -32,7 +32,7 @@ class Miaox_Aop_CodeCompiler
 	/**
 	 *
 	 *
-	 * @var Aop_Weave
+	 * @var Miaox_Aop_Weave
 	 */
 
 	protected $_weave;
@@ -54,8 +54,8 @@ class Miaox_Aop_CodeCompiler
 	 * Конструктор
 	 *
 	 * @param string $sCode
-	 * @param Aop_Weave $weave
-	 * @return Aop_CodeCompiler
+	 * @param Miaox_Aop_Weave $weave
+	 * @return Miaox_Aop_CodeCompiler
 	 */
     public function __construct( $sCode, $weave )
     {
@@ -125,7 +125,7 @@ class Miaox_Aop_CodeCompiler
 	protected function _compileCustomPointcuts()
 	{
     	// Create Code Parser
-		$this->_codeParser = new Aop_CodeParser( $this->_code );
+		$this->_codeParser = new Miaox_Aop_CodeParser( $this->_code );
 		$this->_codeParser->setIndex( 0 );
 
         // Blank result string
@@ -334,7 +334,7 @@ class Miaox_Aop_CodeCompiler
 	protected function _compileAutoPointcuts()
 	{
 		// Create Code Parser
-		$this->_codeParser = new Aop_CodeParser( $this->_code );
+		$this->_codeParser = new Miaox_Aop_CodeParser( $this->_code );
 		$this->_codeParser->setIndex( 0 );
 
 		// Blank result string
@@ -613,11 +613,11 @@ class Miaox_Aop_CodeCompiler
 	 * @param string $class
 	 * @param string $method
 	 * @param string $pointcutName
-	 * @return Aop_Advice
+	 * @return Miaox_Aop_Advice
 	 */
 	public function & getAdviceFromCustomPointcut( $class, $method, $pointcutName )
 	{
-		$advice = new Aop_Advice();
+		$advice = new Miaox_Aop_Advice();
 
 		$a = & $this->_weave->getAdviceFromCustomPointcut( $class, $method, $pointcutName );
 		$code = $a->getData();
@@ -628,7 +628,7 @@ class Miaox_Aop_CodeCompiler
 			// PHP Code Cruncher
 			if ( $this->_compact )
 			{
-				$code = Aop_CodeCruncher::process( $code );
+				$code = Miaox_Aop_CodeCruncher::process( $code );
 			}
 			else
 			{
@@ -650,11 +650,11 @@ class Miaox_Aop_CodeCompiler
 	 * @param string $class
 	 * @param string $method
 	 * @param string $autoPointcut
-	 * @return Aop_Advice
+	 * @return Miaox_Aop_Advice
 	 */
 	public function & getAdviceFromAutoPointcut( $class, $method, $autoPointcut )
 	{
-		$advice = new Aop_Advice();
+		$advice = new Miaox_Aop_Advice();
 
 		$a = & $this->_weave->getAdviceFromAutoPointcut( $class, $method, $autoPointcut );
 		$code = $a->getData();
@@ -665,7 +665,7 @@ class Miaox_Aop_CodeCompiler
 			// PHP Code Cruncher
 			if ( $this->_compact )
 			{
-				$code = Aop_CodeCruncher::process( $code );
+				$code = Miaox_Aop_CodeCruncher::process( $code );
 			}
 			else
 			{

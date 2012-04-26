@@ -24,7 +24,7 @@ class Miaox_Aop_Weave
 	 */
 	protected $_lastModified;
 	/**
-	 * Массив Aop_Aspect
+	 * Массив Miaox_Aop_Aspect
 	 *
 	 * @var array
 	 */
@@ -39,7 +39,7 @@ class Miaox_Aop_Weave
 	/**
 	 * Конструктор
 	 *
-	 * @return Aop_Weave
+	 * @return Miaox_Aop_Weave
 	 */
 	public function __construct()
 	{
@@ -61,12 +61,12 @@ class Miaox_Aop_Weave
 
 
 	/**
-	 * @param Aop_Aspect $aspect
+	 * @param Miaox_Aop_Aspect $aspect
 	 * @return boolean
 	 */
 	public function addAspect( &$aspect )
 	{
-		if ( $aspect instanceof Aop_Aspect )
+		if ( $aspect instanceof Miaox_Aop_Aspect )
 		{
 			$this->_aspects[ count( $this->_aspects ) ] = & $aspect;
 
@@ -84,7 +84,7 @@ class Miaox_Aop_Weave
 
 	/**
 	 * @param integer $i
-	 * @return Aop_Aspect
+	 * @return Miaox_Aop_Aspect
 	 */
 	public function & getAspect( $i )
 	{
@@ -225,7 +225,7 @@ class Miaox_Aop_Weave
 						( is_readable( $file ) && $path[ "extension" ] == "xml" ) )
 					{
 						// Load the aspect.
-						$aspect = & Aop_Aspect::from( $file );
+						$aspect = & Miaox_Aop_Aspect::from( $file );
 
 						// Define it in Aspects list.
 						// Position is relative to defined in Weave constructor.
@@ -242,14 +242,14 @@ class Miaox_Aop_Weave
 	}
 
 	/**
-	 * Добавление аспектов из объекта Aop_Aspect/XAD( xml с аспектами) файла/дирректории, содержащей XAD файлы
+	 * Добавление аспектов из объекта Miaox_Aop_Aspect/XAD( xml с аспектами) файла/дирректории, содержащей XAD файлы
 	 *
 	 * @param string|array|Aop_Aspect &$item
 	 */
 	protected function _handleLoad( &$item )
 	{
 		// If the given argument is an Aspect ( Object )
-		if ( $item instanceof Aop_Aspect )
+		if ( $item instanceof Miaox_Aop_Aspect )
 		{
 			$this->addAspect( $item );
 			// If the given argument is an array of unknown itens
@@ -301,11 +301,11 @@ class Miaox_Aop_Weave
 	 * @param string $className имя класса
 	 * @param string имя метода/функции
 	 * @param string $pointcutName имя среза
-	 * @return Aop_Advice результирующий advice
+	 * @return Miaox_Aop_Advice результирующий advice
 	 */
 	public function & getAdviceFromCustomPointcut( $className, $functionName, $pointcutName )
 	{
-		$advice = new Aop_Advice();
+		$advice = new Miaox_Aop_Advice();
 
 		$aspects = & $this->getAspects();
 		$l = count( $aspects );
@@ -330,11 +330,11 @@ class Miaox_Aop_Weave
 	 * @param string $className имя класса
 	 * @param string имя метода/функции
 	 * @param string $autoPointcut "after"|"before"|"around"
-	 * @return Aop_Advice результирующий advice
+	 * @return Miaox_Aop_Advice результирующий advice
 	 */
 	public function & getAdviceFromAutoPointcut( $className, $functionName, $autoPointcut )
 	{
-		$advice = new Aop_Advice();
+		$advice = new Miaox_Aop_Advice();
 
 		$aspects = $this->getAspects();
 		$l = count( $aspects );

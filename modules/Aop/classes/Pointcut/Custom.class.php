@@ -22,7 +22,7 @@ class Miaox_Aop_Pointcut_Custom extends Miaox_Aop_Pointcut
 	/**
 	 * Конструктор
 	 *
-	 * @param Aop_Advice $action
+	 * @param Miaox_Aop_Advice $action
 	 * @param string|array $class список классов, включаемых в срез
 	 * @param string|array $function список функций/методов, включаемых в срез
 	 * @param string|array $name имя среза

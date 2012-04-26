@@ -36,14 +36,14 @@ class Miaox_Aop_CodeCruncher
 	public static function process( $str )
 	{
 		$result = "";
-		$codeParser = new Aop_CodeParser( $str );
+		$codeParser = new Miaox_Aop_CodeParser( $str );
 
 		while ( ( $token = $codeParser->nextToken() ) !== null )
 		{
         	// Internal characters ( ie, (, {, }, ) ) do not have a token_name
 			if ( is_array( $token ) )
 			{
-        		$result .= Aop_CodeCruncher::analizeToken(
+        		$result .= Miaox_Aop_CodeCruncher::analizeToken(
 					$token,
 					$codeParser->getIndex(),
 					$codeParser->getInit()
@@ -89,7 +89,7 @@ class Miaox_Aop_CodeCruncher
 				{
 					// Last weird behavior of PHP Tokenizer... it puts
 					// the first PHP command as part of the T_OPEN_TAG
-					$result .= Aop_CodeCruncher::analizeToken( $token[ 1 ], $i, $init );
+					$result .= Miaox_Aop_CodeCruncher::analizeToken( $token[ 1 ], $i, $init );
 				} else
 				{
 					$result .= trim( $token[ 1 ] );
