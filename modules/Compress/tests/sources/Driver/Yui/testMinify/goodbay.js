@@ -1,0 +1,4 @@
+function goodbay()
+{
+	alert( 'goodbay' );
+};
