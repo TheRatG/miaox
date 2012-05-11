@@ -11,7 +11,7 @@ implements Miaox_Compress_Driver_Interface
 	 * @param unknown_type $jarFilename
 	 * @param array $options
 	 */
-	public function __construct( $jarFilename = '', Realty_Log $log = null )
+	public function __construct( $jarFilename = '', Miao_Log $log = null )
 	{
 		if ( empty( $jarFilename ) )
 		{

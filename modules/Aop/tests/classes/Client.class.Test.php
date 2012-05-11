@@ -1,33 +1,32 @@
 <?php
 class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 {
-	private $_aop_source_path = '';
-	private $_aop_obj = null;
-	private $_path_tmp;
+	private $_sourceDir = '';
+	private $_aopObj = null;
+	private $_tmp;
 
 	public function setUp()
 	{
-		$uniora_modules_root = realpath( dirname( __FILE__ ) . '/../../../../' );
-		$this->_aop_source_path = $uniora_modules_root . '/modules/Aop/tests/sources';
-		$this->_aop_obj = new Miaox_Aop_Client();
-		$this->_path_tmp = $uniora_modules_root . '/tmp';
-
-		if ( !file_exists( $this->_path_tmp ) )
+		$this->_sourceDir = Miao_PHPUnit::getSourceFolder( 'Miaox_Aop_Test' );
+		$this->_tmp = $this->_sourceDir . '/tmp';
+		if ( !file_exists( $this->_tmp ) )
 		{
-			mkdir( $this->_path_tmp );
+			mkdir( $this->_tmp );
 		}
+
+		$config[ 'cache_dir' ] = $this->_tmp;
+		$this->_aopObj = new Miaox_Aop_Client( $config );
 	}
 
 	public function tearDown()
 	{
-		$path = $this->_path_tmp . '/AopSkeleton*';
-		// shell_exec( sprintf( 'rm -rf %s', $path ) );
+		Miao_PHPUnit::rmdirr( $this->_tmp );
 	}
 
 	public function testBeforeAfterAll()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/before_after_all.xml' );
+		$this->_aopObj->requireFile( $this->_tmp . '/' . $class_name . '.class.php', $this->_sourceDir . '/before_after_all.xml' );
 
 		ob_start();
 		$aoped_obj = new $class_name();
@@ -42,7 +41,7 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 	public function testBeforeAfterFunctionClass()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/before_after_fc.xml' );
+		$this->_aopObj->requireFile( $this->_tmp . '/' . $class_name . '.class.php', $this->_sourceDir . '/before_after_fc.xml' );
 
 		ob_start();
 		$aoped_obj = new $class_name();
@@ -57,7 +56,7 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 	public function testAroundAll()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/around_all.xml' );
+		$this->_aopObj->requireFile( $this->_tmp . '/' . $class_name . '.class.php', $this->_sourceDir . '/around_all.xml' );
 
 		ob_start();
 		$aoped_obj = new $class_name();
@@ -74,7 +73,7 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 	public function testAroundFunctionClass()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/around_fc.xml' );
+		$this->_aopObj->requireFile( $this->_tmp . '/' . $class_name . '.class.php', $this->_sourceDir . '/around_fc.xml' );
 
 		$aoped_obj = new $class_name();
 
@@ -95,7 +94,7 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 	public function testNameAll()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/name_all.xml' );
+		$this->_aopObj->requireFile( $this->_tmp . '/' . $class_name . '.class.php', $this->_sourceDir . '/name_all.xml' );
 
 		$aoped_obj = new $class_name();
 
@@ -112,7 +111,7 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 	public function testNameFunctionClass()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/name_fc.xml' );
+		$this->_aopObj->requireFile( $this->_tmp . '/' . $class_name . '.class.php', $this->_sourceDir . '/name_fc.xml' );
 
 		$aoped_obj = new $class_name();
 
@@ -131,7 +130,7 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 	public function testNameNotFunctionClass()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', $this->_aop_source_path . '/name_nfc.xml' );
+		$this->_aopObj->requireFile( $this->_tmp . '/' . $class_name . '.class.php', $this->_sourceDir . '/name_nfc.xml' );
 		$class_name2 = $class_name . 'Second';
 
 		$aoped_obj = new $class_name();
@@ -152,9 +151,9 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 	public function testDoubleXml()
 	{
 		$class_name = $this->_getCurrentClassName( __METHOD__ );
-		$this->_aop_obj->requireFile( $this->_path_tmp . '/' . $class_name . '.class.php', array(
-			$this->_aop_source_path . '/name_double1.xml',
-			$this->_aop_source_path . '/name_double2.xml' ) );
+		$this->_aopObj->requireFile( $this->_tmp . '/' . $class_name . '.class.php', array(
+			$this->_sourceDir . '/name_double1.xml',
+			$this->_sourceDir . '/name_double2.xml' ) );
 
 		$aoped_obj = new $class_name();
 
@@ -171,9 +170,9 @@ class Miaox_Aop_AopUseTest extends PHPUnit_Framework_TestCase
 
 		$new_class_name = 'AopSkeleton' . $method_name;
 
-		$skeleton_text = file_get_contents( $this->_aop_source_path . '/AopSkeleton.class.php' );
+		$skeleton_text = file_get_contents( $this->_sourceDir . '/AopSkeleton.class.php' );
 		$skeleton_text = str_replace( 'class Miaox_AopSkeleton', 'class ' . $new_class_name, $skeleton_text );
-		file_put_contents( $this->_path_tmp . '/' . $new_class_name . '.class.php', $skeleton_text );
+		file_put_contents( $this->_tmp . '/' . $new_class_name . '.class.php', $skeleton_text );
 
 		return $new_class_name;
 	}

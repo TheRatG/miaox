@@ -9,15 +9,6 @@
  * @package Tools
  * @subpackage Tools_Aop
  *
- *             <code>
- *             $aop_obj = new Aop_Client();
- *             $class_path = $aop_obj->getPathByClassName(
- *             'Realty_Import_MultiThread' );
- *             $project_root = Uniora_Core_Config::Main()->paths->root;
- *             $aop_obj->requireFile( $class_path, $project_root .
- *             '/data/import/statistic.xml' );
- *             </code>
- *
  */
 class Miaox_Aop_Client
 {

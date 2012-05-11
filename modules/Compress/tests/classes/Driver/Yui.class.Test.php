@@ -1,5 +1,5 @@
 <?php
-class Miao_Compress_Driver_Yui_Test extends PHPUnit_Framework_TestCase
+class Miaox_Compress_Driver_Yui_Test extends PHPUnit_Framework_TestCase
 {
 	protected $_moduleRoot;
 
@@ -9,7 +9,7 @@ class Miao_Compress_Driver_Yui_Test extends PHPUnit_Framework_TestCase
 		$this->_path = $path;
 
 		$sourceDir = Miao_PHPUnit::getSourceFolder(
-			'Miao_Compress_TestCompress_Test' );
+			'Miaox_Compress_TestCompress_Test' );
 		$moduleRoot = $path->getModuleRoot( 'Miao_TestCompress' );
 		Miao_PHPUnit::copyr( $sourceDir, $moduleRoot );
 
@@ -31,7 +31,7 @@ class Miao_Compress_Driver_Yui_Test extends PHPUnit_Framework_TestCase
 		{
 			$this->setExpectedException( $exceptionName );
 		}
-		$obj = new Miao_Compress_Driver_Yui( $filename );
+		$obj = new Miaox_Compress_Driver_Yui( $filename );
 
 		$expected = $obj->getJarFilename();
 
@@ -47,8 +47,8 @@ class Miao_Compress_Driver_Yui_Test extends PHPUnit_Framework_TestCase
 		$data = array();
 
 		$moduleDir = Miao_Path::getDefaultInstance()->getModuleRoot( __CLASS__ );
-		$exceptionName = 'Miao_Compress_Driver_Yui_Exception';
-		$data[] = array( $moduleDir . '/data/yuicompressor-2.4.7.jar' );
+		$exceptionName = 'Miaox_Compress_Driver_Yui_Exception';
+		$data[] = array( $moduleDir . '/data/yuicompressor.jar' );
 		$data[] = array( '' );
 		$data[] = array( 'asd.jar', $exceptionName );
 
@@ -69,7 +69,7 @@ class Miao_Compress_Driver_Yui_Test extends PHPUnit_Framework_TestCase
 			$this->setExpectedException( $exceptionName );
 		}
 
-		$obj = new Miao_Compress_Driver_Yui();
+		$obj = new Miaox_Compress_Driver_Yui();
 		$obj->setOptions( $options );
 	}
 
@@ -77,7 +77,7 @@ class Miao_Compress_Driver_Yui_Test extends PHPUnit_Framework_TestCase
 	{
 		$data = array();
 
-		$exceptionName = 'Miao_Compress_Driver_Yui_Exception';
+		$exceptionName = 'Miaox_Compress_Driver_Yui_Exception';
 
 		$data[] = array( array( 'type' => 'js' ), '' );
 		$data[] = array( array( 'type' => 'css', 'v' => '' ), '' );
@@ -102,14 +102,14 @@ class Miao_Compress_Driver_Yui_Test extends PHPUnit_Framework_TestCase
 	 */
 	public function testMinify( $fileList, $dstFilename, $options, $actualFilename, $exceptionName = '' )
 	{
-		$this->markTestSkipped( 'Miao_Compress_Driver_Yui_Test test skipped, because work long time' );
+		//$this->markTestSkipped( 'Miaox_Compress_Driver_Yui_Test test skipped, because work long time' );
 		if ( !empty( $exceptionName ) )
 		{
 			$this->setExpectedException( $exceptionName );
 		}
 
-		$log = Miao_Log::factory2( $this->_moduleRoot . '/' . 'test_minify_log', false );
-		$obj = new Miao_Compress_Driver_Yui( '', $log );
+		$log = Miao_Log::easyFactory( $this->_moduleRoot . '/' . 'test_minify_log', false );
+		$obj = new Miaox_Compress_Driver_Yui( '', $log );
 		$obj->minify( $fileList, $dstFilename, $options );
 		$this->assertFileEquals( $dstFilename, $actualFilename );
 
@@ -124,7 +124,7 @@ class Miao_Compress_Driver_Yui_Test extends PHPUnit_Framework_TestCase
 
 		$files = array(	$sourceDir . '/hello.js', $sourceDir . '/goodbay.js' );
 		$dstFilename = $sourceDir . '/expected_min_1.js';
-		$options = array( 'charset' => 'utf-8', 'v' => true, 'type' => Miao_Compress_Driver_Yui::TYPE_JS );
+		$options = array( 'charset' => 'utf-8', 'v' => true, 'type' => Miaox_Compress_Driver_Yui::TYPE_JS );
 		$actualFilename = $sourceDir . '/actual_min_1.js';
 
 		$data[] = array( $files, $dstFilename, $options, $actualFilename );

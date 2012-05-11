@@ -3,7 +3,7 @@ class Miaox_Compress_Driver
 {
 	/**
 	 *
-	 * @var Realty_Log
+	 * @var Miao_Log
 	 */
 	protected $_log;
 
