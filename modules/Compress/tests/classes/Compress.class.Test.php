@@ -1,5 +1,5 @@
 <?php
-class Miao_Compress_Test extends PHPUnit_Framework_TestCase
+class Miaox_Compress_Test extends PHPUnit_Framework_TestCase
 {
 	protected $_moduleRoot;
 
@@ -9,8 +9,8 @@ class Miao_Compress_Test extends PHPUnit_Framework_TestCase
 		$this->_path = $path;
 
 		$sourceDir = Miao_PHPUnit::getSourceFolder(
-			'Miao_Compress_TestCompress_Test' );
-		$moduleRoot = $path->getModuleRoot( 'Miao_TestCompress' );
+			'Miaox_Compress_TestCompress_Test' );
+		$moduleRoot = $path->getModuleRoot( 'Miaox_TestCompress' );
 		Miao_PHPUnit::copyr( $sourceDir, $moduleRoot );
 
 		$this->_moduleRoot = $moduleRoot;
@@ -34,7 +34,7 @@ class Miao_Compress_Test extends PHPUnit_Framework_TestCase
 
 		$options = array();
 		$driver = new $driverClassName( $options );
-		$compress = new Miao_Compress( $driver );
+		$compress = new Miaox_Compress( $driver );
 		$this->assertTrue( is_object( $compress ) );
 	}
 
@@ -42,10 +42,10 @@ class Miao_Compress_Test extends PHPUnit_Framework_TestCase
 	{
 		$data = array();
 
-		$exceptionName = 'Miao_Compress_Exception';
+		$exceptionName = 'Miaox_Compress_Exception';
 
-		$data[] = array( 'Miao_TestCompress_Driver_Invalid', $exceptionName );
-		$data[] = array( 'Miao_TestCompress_Driver_Null', '' );
+		$data[] = array( 'Miaox_TestCompress_Driver_Invalid', $exceptionName );
+		$data[] = array( 'Miaox_TestCompress_Driver_Null', '' );
 
 		return $data;
 	}
@@ -57,8 +57,8 @@ class Miao_Compress_Test extends PHPUnit_Framework_TestCase
 	public function testMakeFilename( $dstFolder, $filenameList, $type, $exceptionName = '' )
 	{
 		$actual = $dstFolder . '/' . md5( implode( ':', $filenameList ) ) . '.js';
-		$expected = Miao_Compress::makeFilename( $dstFolder, $filenameList );
-		
+		$expected = Miaox_Compress::makeFilename( $dstFolder, $filenameList );
+
 		$this->assertEquals( $expected, $actual );
 	}
 

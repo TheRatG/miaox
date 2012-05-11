@@ -1,5 +1,5 @@
 <?php
-class Realty_Compress_Driver
+class Miaox_Compress_Driver
 {
 	/**
 	 *
@@ -24,7 +24,6 @@ class Realty_Compress_Driver
 	{
 		assert( is_array( $files ) && !empty( $files ) );
 
-		//var_dump('tut');
 		$message = sprintf( 'MINIFY: start mergeFiles to "%s"', $outpuFilename );
 		$this->_log->info( $message );
 
@@ -40,7 +39,7 @@ class Realty_Compress_Driver
 			{
 				$message = sprintf( 'MINIFY ERROR: File not found "%s"', $filename );
 				$this->_log->crit( $message );
-				throw new Realty_Compress_Driver_Exception( $message );
+				throw new Miaox_Compress_Driver_Exception( $message );
 			}
 
 			$command = sprintf( 'cat "%s" >> "%s"', $filename, $outpuFilename );
@@ -56,11 +55,11 @@ class Realty_Compress_Driver
 
 	/**
 	 *
-	 * @return Realty_Tools_Shell
+	 * @return Miao_Tools_Shell
 	 */
 	protected function _getShell()
 	{
-		$result = Realty_Tools_Shell::getInstance( true );
+		$result = Miao_Tools_Shell::getInstance( true );
 		$result->setLog( $this->getLog() );
 		return $result;
 	}

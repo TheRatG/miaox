@@ -1,5 +1,5 @@
 <?php
-class Realty_Compress_Exception extends Exception
+class Miaox_Compress_Exception extends Exception
 {
 
 }

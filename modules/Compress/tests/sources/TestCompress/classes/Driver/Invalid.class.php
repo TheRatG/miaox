@@ -1,5 +1,5 @@
 <?php
-class Miao_TestCompress_Driver_Invalid
+class Miaox_TestCompress_Driver_Invalid
 {
 
 }

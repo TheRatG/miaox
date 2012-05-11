@@ -1,5 +1,5 @@
 <?php
-class Miao_TestCompress_Driver_Null implements Miao_Compress_Driver_Interface
+class Miaox_TestCompress_Driver_Null implements Miaox_Compress_Driver_Interface
 {
 	public function setLog( $logObj )
 	{

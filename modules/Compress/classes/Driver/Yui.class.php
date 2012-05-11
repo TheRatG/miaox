@@ -1,5 +1,5 @@
 <?php
-class Realty_Compress_Driver_Yui extends Realty_Compress_Driver implements Realty_Compress_Driver_Interface
+class Miaox_Compress_Driver_Yui extends Miaox_Compress_Driver implements Miaox_Compress_Driver_Interface
 {
 	const TYPE_JS = 'js';
 	const TYPE_CSS = 'css';
@@ -21,19 +21,18 @@ class Realty_Compress_Driver_Yui extends Realty_Compress_Driver implements Realt
 
 	/**
 	 *
-	 *
 	 * @param unknown_type $jarFilename
 	 * @param array $options
 	 */
-	public function __construct( $jarFilename = '', Realty_Tools_Log $log = null )
+	public function __construct( $jarFilename = '', Miao_Log $log = null )
 	{
 		if ( empty( $jarFilename ) )
 		{
-			$jarFilename = Realty_Config::Libs( __CLASS__ )->get( 'jar_filename' );
+			$jarFilename = Miao_Path::getDefaultInstance()->getModuleRoot( __CLASS__ ) . '/data/yuicompressor.jar';
 		}
 		if ( is_null( $log ) )
 		{
-			$log = Uniora_Tools_Log::getInstance();
+			$log = Miao_Log::easyFactory( '', '' );
 		}
 		parent::__construct( $log );
 		$this->setJarFilename( $jarFilename );
@@ -58,7 +57,7 @@ class Realty_Compress_Driver_Yui extends Realty_Compress_Driver implements Realt
 
 		if ( !empty( $message ) )
 		{
-			throw new Realty_Compress_Driver_Yui_Exception( $message );
+			throw new Miaox_Compress_Driver_Yui_Exception( $message );
 		}
 
 		$this->_jarFilename = $filename;
@@ -68,7 +67,6 @@ class Realty_Compress_Driver_Yui extends Realty_Compress_Driver implements Realt
 	{
 		return $this->_jarFilename;
 	}
-
 
 	public function setOptions( array $options )
 	{
@@ -82,7 +80,7 @@ class Realty_Compress_Driver_Yui extends Realty_Compress_Driver implements Realt
 				$message .= sprintf( "\n %s", $error );
 			}
 
-			throw new Realty_Compress_Driver_Yui_Exception( $message );
+			throw new Miaox_Compress_Driver_Yui_Exception( $message );
 		}
 
 		if ( array_key_exists( 'v', $options ) )
@@ -98,10 +96,10 @@ class Realty_Compress_Driver_Yui extends Realty_Compress_Driver implements Realt
 	{
 		return $this->_options;
 	}
-	
-	public function addOption($key, $value)
+
+	public function addOption( $key, $value )
 	{
-	   $this->_options[$key] = $value;
+		$this->_options[ $key ] = $value;
 	}
 
 	public function checkOptions( array $options, array &$errors = array() )

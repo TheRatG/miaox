@@ -1,7 +1,7 @@
 <?php
-class Realty_Compress_Driver_ClosureCompiler
-extends Realty_Compress_Driver
-implements Realty_Compress_Driver_Interface
+class Miaox_Compress_Driver_ClosureCompiler
+extends Miaox_Compress_Driver
+implements Miaox_Compress_Driver_Interface
 {
 	private $_jarFilename = array();
 
@@ -15,11 +15,11 @@ implements Realty_Compress_Driver_Interface
 	{
 		if ( empty( $jarFilename ) )
 		{
-			$jarFilename = Realty_Config::Libs( __CLASS__ )->get( 'jar_filename' );
+			$jarFilename = Miao_Path::getDefaultInstance()->getModuleRoot( __CLASS__ ) . '/data/compiler.jar';
 		}
 		if ( is_null( $log ) )
 		{
-			$log = Realty_Log::factory2( '' );
+			$log = Miao_Log::easyFactory( '', '' );
 		}
 		parent::__construct( $log );
 		$this->setJarFilename( $jarFilename );
@@ -44,7 +44,7 @@ implements Realty_Compress_Driver_Interface
 
 		if ( !empty( $message ) )
 		{
-			throw new Realty_Compress_Driver_ClosureCompiler_Exception( $message );
+			throw new Miaox_Compress_Driver_ClosureCompiler_Exception( $message );
 		}
 
 		$this->_jarFilename = $filename;
@@ -60,17 +60,12 @@ implements Realty_Compress_Driver_Interface
 		$msg = sprintf( 'Start minify by ClosureCompiler (Google)' );
 		$this->getLog()->debug( $msg );
 
-//		$totalFilename = realpath( dirname( $dstFilename ) ) . '/' . 'total_' . rand( 1, 900 ) . '.js';
-//		$totalFilename = $this->mergeFiles( $fileList, $totalFilename );
-
 		$command = $this->_makeMinifyCommand( $fileList, $dstFilename );
 
 		$shell = $this->_getShell();
 		$returnVal = 0;
 		$output = null;
 		$shell->exec( $command, $returnVal, false, $output );
-
-//		unlink( $totalFilename );
 
 		return $output;
 	}
