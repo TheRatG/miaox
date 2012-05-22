@@ -6,6 +6,10 @@ class Miaox_Compress_Client
 	private $_dstFolder;
 	private $_enabled;
 
+	private $_map = array(
+		'js' => array( 'path' => 'getJsPath', 'minify' => '_minifyJs' ),
+		'css' => array( 'path' => 'getCssPath', 'minify' => '_minifyCss' ) );
+
 	/**
 	 *
 	 * @return the $_jsPath
@@ -86,17 +90,17 @@ class Miaox_Compress_Client
 
 	public function getCss( array $filenameList, $compress = false )
 	{
-		$result = $this->_getFilenameList( $filenameList, $compress, '_minifyCss' );
+		$result = $this->_getFilenameList( $filenameList, $compress, 'css' );
 		return $result;
 	}
 
 	public function getJs( array $filenameList, $compress = false )
 	{
-		$result = $this->_getFilenameList( $filenameList, $compress, '_minifyJs' );
+		$result = $this->_getFilenameList( $filenameList, $compress, 'js' );
 		return $result;
 	}
 
-	public function prepareFileList( array $fileList )
+	public function prepareFileList( array $fileList, $pathMethod )
 	{
 		$erMessage = array();
 		$result = array();
@@ -108,7 +112,7 @@ class Miaox_Compress_Client
 				$fullFilename = $this->getDstFolder() . DIRECTORY_SEPARATOR . $filename;
 				if ( !file_exists( $fullFilename ) )
 				{
-					$fullFilename = $this->getDstFolder() . DIRECTORY_SEPARATOR . $this->getCssPath() . DIRECTORY_SEPARATOR . $filename;
+					$fullFilename = $this->getDstFolder() . DIRECTORY_SEPARATOR . $this->$pathMethod() . DIRECTORY_SEPARATOR . $filename;
 				}
 			}
 
@@ -130,9 +134,13 @@ class Miaox_Compress_Client
 		return $result;
 	}
 
-	protected function _getFilenameList( array $filenameList, $compress, $method )
+	protected function _getFilenameList( array $filenameList, $compress, $type )
 	{
-		$preparedFilenameList = $this->prepareFileList( $filenameList );
+		$mList = $this->_map[ $type ];
+		$pathMethod = $mList[ 'path' ];
+		$minifyMethod = $mList[ 'minify' ];
+
+		$preparedFilenameList = $this->prepareFileList( $filenameList, $pathMethod );
 		if ( !$this->getEnabled() )
 		{
 			$result = $preparedFilenameList;
@@ -140,11 +148,11 @@ class Miaox_Compress_Client
 		else
 		{
 			$dstFolder = $this->getDstFolder();
-			$dstFilename = Miaox_Compress::makeFilename( $dstFolder, $filenameList );
+			$dstFilename = Miaox_Compress::makeFilename( $dstFolder, $filenameList, $pathMethod );
 
 			if ( $compress )
 			{
-				$result = $this->$method( $preparedFilenameList, $dstFilename );
+				$result = $this->$minifyMethod( $preparedFilenameList, $dstFilename );
 			}
 			else if ( file_exists( $dstFilename ) )
 			{
