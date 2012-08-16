@@ -5,6 +5,8 @@ class Miaox_DevOffice_Action_Access_Resource extends Miao_Office_Action
 	public function execute()
 	{
 		$error = '';
+		$res = false;
+		$message = '';
 		try
 		{
 			$request = Miao_Office_Request::getInstance();
@@ -12,28 +14,35 @@ class Miaox_DevOffice_Action_Access_Resource extends Miao_Office_Action
 			$resourceId = $request->getValueOf( 'resource_id' );
 			$action = $request->getValueOf( 'action' );
 
-			$acs = Miaox_Acs_Instance::acs();
+			$acs = Miaox_Acs_Instance::adapter();
 
 			$class = 'icon-off';
 			if ( $action )
 			{
 				$class = 'icon-ok';
 
-				$acs->allowResource($groupId, $resourceId);
+				$res = $acs->allowResource( $groupId, $resourceId );
+				$message .= 'Success allow. ';
 			}
 			else
 			{
-				$acs->denyResource($groupId, $resourceId);
+				$res = $acs->denyResource( $groupId, $resourceId );
+				$message .= 'Success deny. ';
 			}
-
-			$message = sprintf( 'Group id: %s, resource_id: %s, action: %s', $groupId, $resourceId, $action );
+			if ( false === $res )
+			{
+				$error = 'Something wrong';
+			}
+			$message .= sprintf( 'Group id: %s, resource_id: %s, action: %s', $groupId, $resourceId, $action );
 		}
 		catch ( Exception $e )
 		{
 			$error = $e->getMessage();
 		}
-
-		$data = array( 'message' => $message, 'error' => $error, 'class' => $class );
+		$data = array(
+			'message' => $message,
+			'error' => $error,
+			'class' => $class );
 		return json_encode( $data );
 	}
 }

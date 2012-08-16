@@ -1,6 +1,7 @@
 <?php
 class Miaox_Acs_Adapter_Db_Permission extends Miaox_PDO_Table
 {
+
 	protected function _init()
 	{
 		$this->setName( 'tbl_acs_permission' );
@@ -28,14 +29,14 @@ class Miaox_Acs_Adapter_Db_Permission extends Miaox_PDO_Table
 			if ( !isset( $result[ $key ] ) )
 			{
 				$result[ $key ] = array(
-						'resource_id' => $item[ 'resource_id' ],
-						'resource_name' => $item[ 'resource_name' ],
-						'groups' => array() );
+					'resource_id' => $item[ 'resource_id' ],
+					'resource_name' => $item[ 'resource_name' ],
+					'groups' => array() );
 			}
 			$result[ $key ][ 'groups' ][] = array(
-					'group_id' => $item[ 'group_id' ],
-					'group_name' => $item[ 'group_name' ],
-					'is_allow' => $item[ 'is_allow' ] );
+				'group_id' => $item[ 'group_id' ],
+				'group_name' => $item[ 'group_name' ],
+				'is_allow' => $item[ 'is_allow' ] );
 		}
 		return $result;
 	}
@@ -44,6 +45,32 @@ class Miaox_Acs_Adapter_Db_Permission extends Miaox_PDO_Table
 	{
 		$query = 'CREATE  TABLE  IF NOT EXISTS "' . $this->getName() . '" ( "group_id" INTEGER NOT NULL , "resource_id" INTEGER NOT NULL , PRIMARY KEY ( "group_id", "resource_id" ) )';
 		$this->_pdo->exec( $query );
+	}
+
+	/**
+	 *
+	 * @param integer $groupId
+	 * @param integer $resourceId
+	 * @return boolean
+	 */
+	public function allowResource( $groupId, $resourceId )
+	{
+		$query = 'INSERT INTO "' . $this->getName() . '" ( "group_id", "resource_id" ) VALUES( :group_id, :resource_id )';
+		$statement = $this->_pdo->prepare( $query );
+		$statement->bindValue( ':group_id', $groupId, PDO::PARAM_INT );
+		$statement->bindValue( ':resource_id', $resourceId, PDO::PARAM_INT );
+		$result = $statement->execute();
+		return $result;
+	}
+
+	public function denyResource( $groupId, $resourceId )
+	{
+		$query = 'DELETE FROM "' . $this->getName() . '" WHERE group_id = :group_id and resource_id = :resource_id';
+		$statement = $this->_pdo->prepare( $query );
+		$statement->bindValue( ':group_id', $groupId );
+		$statement->bindValue( ':resource_id', $resourceId );
+		$result = $statement->execute();
+		return $result;
 	}
 
 	public function allowForAll( $groupId )

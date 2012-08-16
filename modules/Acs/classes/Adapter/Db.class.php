@@ -13,16 +13,19 @@ class Miaox_Acs_Adapter_Db implements Miaox_Acs_Adapter_Interface
 	 * @var Miaox_Acs_Adapter_Db_Group
 	 */
 	private $_group;
+
 	/**
 	 *
 	 * @var Miaox_Acs_Adapter_Db_People
 	 */
 	private $_people;
+
 	/**
 	 *
 	 * @var Miaox_Acs_Adapter_Db_Resource
 	 */
 	private $_resource;
+
 	/**
 	 *
 	 * @var Miaox_Acs_Adapter_Db_Permission
@@ -49,12 +52,24 @@ class Miaox_Acs_Adapter_Db implements Miaox_Acs_Adapter_Interface
 		$this->_init();
 	}
 
-	public function allowResource()
+	/**
+	 *
+	 * @see Miaox_Acs_Adapter_Interface::allowResource
+	 */
+	public function allowResource( $groupId, $resourceId )
 	{
+		$result = $this->permission()->allowResource( $groupId, $resourceId );
+		return $result;
 	}
 
-	public function denyResource()
+	/**
+	 *
+	 * @return boolean
+	 */
+	public function denyResource( $groupId, $resourceId )
 	{
+		$result = $this->permission()->denyResource( $groupId, $resourceId );
+		return $result;
 	}
 
 	public function getPermission()

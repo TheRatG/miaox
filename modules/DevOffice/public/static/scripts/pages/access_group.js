@@ -18,7 +18,8 @@ define( ['jquery'], function ( $ ) {
     		group_id=$el.data('group_id'), 
     		resource_id=$el.data('resource_id'),
     		action,
-    		success, data, pnotifyData = { styling: 'bootstrap' };
+    		success, error, 
+    		data, pnotifyData = { styling: 'bootstrap' };
     	
     	action = 1;
     	if ( $el.hasClass('icon-ok') ) {
@@ -26,6 +27,7 @@ define( ['jquery'], function ( $ ) {
     	}
     	
     	success = function(data) {
+    		console.log(data);
     		if ( !data['error'] ) {
     			$el.attr('class', data['class']);
     			//$.notifier.notice();
@@ -43,6 +45,13 @@ define( ['jquery'], function ( $ ) {
     		
     		$.pnotify( pnotifyData );
     	};
+    	error = function(jqXHR, textStatus, errorThrown){
+			  pnotifyData = {
+				  type: 'error',
+				  text: jqXHR.responseText
+			  };
+			  $.pnotify( pnotifyData );
+    	};
     	
     	data = {
   			  'group_id': group_id,
@@ -54,6 +63,7 @@ define( ['jquery'], function ( $ ) {
     		  url: '/?_action=Access_Resource&_prefix=Miaox_DevOffice',
     		  data: data,
     		  success: success,
+    		  error: error,
     		  dataType: 'json'
 		});
     };
