@@ -1,5 +1,5 @@
 <?php
-$config = include dirname( __FILE__ ) . '/../data/config.php';
+$config = include dirname( __FILE__ ) . '/../data/config_map.php';
 foreach ( $config[ 'libs' ] as $value )
 {
 	if ( 'Miao' == $value[ 'name' ] )
