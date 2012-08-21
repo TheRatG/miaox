@@ -7,17 +7,13 @@ interface Miaox_Acs_Adapter_Interface
 	 * @param scalar $resourceId
 	 * @return bool
 	 */
-	public function allowResource( $groupId, $resourceId );
+	public function allowResource( $groupId, $resourceName );
 
 	/**
 	 *
 	 * @param scalar $groupId
-	 * @param scalar $resourceId
+	 * @param scalar $resourceName
 	 * @return bool
 	 */
-	public function denyResource( $groupId, $resourceId );
-
-	public function getPermission();
-
-	public function getUser();
+	public function denyResource( $groupId, $resourceName );
 }
