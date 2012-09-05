@@ -17,7 +17,68 @@ class Miaox_File
 
 	static public function getExtension( $filename )
 	{
-		$result = pathinfo( $filename, PATHINFO_EXTENSION );
+		$result = self::getExtensionByMime( $filename );
+		if ( !$result )
+		{
+			$result = pathinfo( $filename, PATHINFO_EXTENSION );
+		}
+		return $result;
+	}
+
+	static public function getExtensionByMime( $filename )
+	{
+
+		$map = array(
+			'image/bmp' => 'bmp',
+			'image/cis-cod' => 'cod',
+			'image/gif' => 'gif',
+			'image/ief' => 'ief',
+			'image/jpeg' => 'jpg',
+			'image/pipeg' => 'jfif',
+			'image/tiff' => 'tif',
+			'image/x-cmu-raster' => 'ras',
+			'image/x-cmx' => 'cmx',
+			'image/x-icon' => 'ico',
+			'image/x-portable-anymap' => 'pnm',
+			'image/x-portable-bitmap' => 'pbm',
+			'image/x-portable-graymap' => 'pgm',
+			'image/x-portable-pixmap' => 'ppm',
+			'image/x-rgb' => 'rgb',
+			'image/x-xbitmap' => 'xbm',
+			'image/x-xpixmap' => 'xpm',
+			'image/x-xwindowdump' => 'xwd',
+			'image/png' => 'png',
+			'image/x-jps' => 'jps',
+			'image/x-freehand' => 'fh',
+			'plain/text' => 'txt' );
+		$mimetype = '';
+
+		$exceptionizer = new Miaox_Exceptionizer( E_ALL );
+		try
+		{
+			if ( !function_exists( 'mime_content_type' ) )
+			{
+
+				function mime_content_type( $filename )
+				{
+					$finfo = finfo_open( FILEINFO_MIME );
+					$mimetype = finfo_file( $finfo, $filename );
+					finfo_close( $finfo );
+				}
+			}
+			$mimetype = mime_content_type( $filename );
+		}
+		catch ( E_WARNING $e )
+		{
+
+		}
+		unset( $exceptionizer );
+
+		$result = null;
+		if ( isset( $map[ $mimetype ] ) )
+		{
+			$result = $map[ $mimetype ];
+		}
 		return $result;
 	}
 

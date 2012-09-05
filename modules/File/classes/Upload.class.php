@@ -31,7 +31,15 @@ class Miaox_File_Upload
 		foreach ( $files as $index => $file )
 		{
 			$filename = $file[ 'tmp_name' ];
-			$result[ $index ] = $this->run( $filename );
+
+			$name = $this->_getSafeName( $file[ 'name' ] );
+			$destination = $this->_baseDir . '/' . $name;
+			Miaox_File::mkdir( dirname( $destination ), 0777 );
+
+			move_uploaded_file( $filename, $destination );
+
+			$result[ $index ] = $this->run( $destination );
+			unlink( $destination );
 		}
 		return $result;
 	}
@@ -42,7 +50,7 @@ class Miaox_File_Upload
 		$dirname = dirname( $newFilename );
 		if ( !file_exists( $dirname ) )
 		{
-			Miaox_File::mkdir( $dirname, $this->_mode );
+			Miaox_File::mkdir( $dirname, $this->_mode, true );
 		}
 		$res = copy( $file, $newFilename );
 		return $newFilename;
@@ -81,5 +89,52 @@ class Miaox_File_Upload
 		$ar = array_slice( $ar, count( $ar ) - $cntSubDir, $cntSubDir );
 		$result = DIRECTORY_SEPARATOR . implode( DIRECTORY_SEPARATOR, $ar );
 		return $result;
+	}
+
+	/**
+	 * Получить допустимое имя, близкое к оригиналу, но не содержашее спец символов
+	 *
+	 * @param string $real_name
+	 * @return string
+	 */
+	private function _getSafeName( $real_name )
+	{
+		$rus = array(
+			'ё',
+			'ж',
+			'ц',
+			'ч',
+			'ш',
+			'щ',
+			'ю',
+			'я',
+			'Ё',
+			'Ж',
+			'Ц',
+			'Ч',
+			'Ш',
+			'Щ',
+			'Ю',
+			'Я' );
+		$lat = array(
+			'yo',
+			'zh',
+			'tc',
+			'ch',
+			'sh',
+			'sh',
+			'yu',
+			'ya',
+			'YO',
+			'ZH',
+			'TC',
+			'CH',
+			'SH',
+			'SH',
+			'YU',
+			'YA' );
+		$real_name = str_replace( $rus, $lat, $real_name );
+		$real_name = strtr( $real_name, "АБВГДЕЗИЙКЛМНОПРСТУФХЪЫЬЭабвгдезийклмнопрстуфхъыьэ", "ABVGDEZIJKLMNOPRSTUFH_I_Eabvgdezijklmnoprstufh_i_e" );
+		return preg_replace( '#[^-a-zA-Z0-9._]#', '_', $real_name );
 	}
 }
