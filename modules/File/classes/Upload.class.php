@@ -32,7 +32,7 @@ class Miaox_File_Upload
 		{
 			$filename = $file[ 'tmp_name' ];
 
-			$name = $this->_getSafeName( $file[ 'name' ] );
+			$name = self::getSafeName( $file[ 'name' ] );
 			$destination = $this->_baseDir . '/' . $name;
 			Miaox_File::mkdir( dirname( $destination ), 0777 );
 
@@ -97,7 +97,7 @@ class Miaox_File_Upload
 	 * @param string $real_name
 	 * @return string
 	 */
-	private function _getSafeName( $real_name )
+	static public function getSafeName( $real_name )
 	{
 		$rus = array(
 			'ё',
