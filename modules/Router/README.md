@@ -54,11 +54,11 @@ Miaox_Router
 
 *`<validator>`* - валидаторы для переменных атрибуты:
 
-type - тип проверки, доступны следующие типы: regexp, notEmpty, numeric, если тип не определен, то notEmpty.
+*type* - тип проверки, доступны следующие типы: regexp, notEmpty, numeric, если тип не определен, то notEmpty.
 
-regexp - регулярное выражение PCRE, используется только для валидаторов type=regexp.
+*regexp* - регулярное выражение PCRE, используется только для валидаторов type=regexp.
 
-param - имя параметра, для которого применяется валидатор, если параметр не опеределен в url, то валидатор игнорируется
+*param* - имя параметра, для которого применяется валидатор, если параметр не опеределен в url, то валидатор игнорируется
 
 #### Описание тэга *`<error>`* ####
 
@@ -133,7 +133,7 @@ action - action проекта
     echo $router->genUrlByView('Main'); // вернет "/"
     echo $router->genUrlByView('TestView', array ('social' => 'test10', 'id' => 123, 'var' => 'testA')); // вернет "/done/test10/123/testA"
     echo $router->genUrlByView('TestView', array ('social' => 'test10', 'id' => 'a', 'var' => 'testA')); // вернет пустую строку - переменная id не прошла валидацию
-    echo $router->genUrlByAction('TestAction', array ('social' => 'test')); // вернет "/done/test10/123/testA"
+    echo $router->genUrlByAction('TestAction', array ('social' => 'test')); // вернет "/load/test/"
 
 При генерации проверяются переданные параметры, если значения параметров не валидно, то поиск продолжается.
 В случае если ничего не найдено вместо url вернется пустая строка.
