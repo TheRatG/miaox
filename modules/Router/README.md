@@ -33,6 +33,7 @@ Miaox_Router
                             <view>TestView</view>
                             <validator type="NotEmpty" param="social" />
                             <validator type="Numeric" param="id" />
+                            <validator type="Len" param="id" max="2" min="1" />
                             <validator param="var" />
                         </route>
                         <error code="404" view="404" />
