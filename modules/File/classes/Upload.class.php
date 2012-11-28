@@ -44,7 +44,7 @@ class Miaox_File_Upload
 		return $result;
 	}
 
-	public function run( $file )
+	public function run( $file, $filemode = 0666 )
 	{
 		$newFilename = $this->getFilename( $file );
 		$dirname = dirname( $newFilename );
@@ -53,6 +53,7 @@ class Miaox_File_Upload
 			Miaox_File::mkdir( $dirname, $this->_mode, true );
 		}
 		$res = copy( $file, $newFilename );
+		chmod( $newFilename, $filemode );
 		return $newFilename;
 	}
 
