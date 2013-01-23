@@ -1,2 +1,3 @@
 tmp/*
 data/config*
+modules/Search/tests/data/sphinx/*

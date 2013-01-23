@@ -6,10 +6,10 @@
 class Miaox_Search_SphinxQl_Connection
 {
 	/**
-	 * MySQLi connection
+	 * MySQLi
 	 * @var MySQLi
 	 */
-	protected $_connection;
+	protected $_driver;
 
 	/**
 	 *
@@ -26,6 +26,15 @@ class Miaox_Search_SphinxQl_Connection
 	{
 		$this->_host = $host;
 		$this->_port = $port;
+	}
+
+	public function __destruct()
+	{
+		if ( $this->isConnected() )
+		{
+			$this->close();
+		}
+		unset( $this->_driver );
 	}
 
 	/**
@@ -49,7 +58,7 @@ class Miaox_Search_SphinxQl_Connection
 		{
 			throw new Miaox_Search_SphinxQl_Connection_Exception( 'Connection error: [' . $conn->connect_errno . ']' . $conn->connect_error );
 		}
-		$this->_connection = $conn;
+		$this->_driver = $conn;
 		return true;
 	}
 
@@ -58,7 +67,7 @@ class Miaox_Search_SphinxQl_Connection
 	 */
 	public function close()
 	{
-		$result = $this->_connection->close();
+		$result = $this->_driver->close();
 		return $result;
 	}
 
@@ -69,21 +78,77 @@ class Miaox_Search_SphinxQl_Connection
 	 */
 	public function ping()
 	{
-		$result = $this->_connection->ping();
+		$result = $this->_driver->ping();
+		return $result;
+	}
+
+	public function isConnected()
+	{
+		$result = !is_null( $this->_driver );
 		return $result;
 	}
 
 	/**
 	 * Sends the query to Sphinx
-	 * @param string $query The query string
+	 *
+	 * @param  string  $query  The query string
 	 * @return  array  The result array
+	 * @throws  Miaox_Search_SphinxQl_Connection_Exception  If the executed query produced an error
 	 */
-// 	public function query( $query )
-// 	{
-// 		if ( !$this->ping() )
-// 		{
-// 			$this->connect();
-// 		}
-// 		$resource = $this->_connection->query( $query );
-// 	}
+	public function query( $query )
+	{
+		if ( !$this->isConnected() )
+		{
+			$this->connect();
+		}
+
+		$resource = $this->_driver->query( $query );
+
+		if ( $this->_driver->error )
+		{
+			throw new Miaox_Search_SphinxQl_Connection_Exception( '[' . $this->_driver->errno . '] ' . $this->_driver->error . ' [ ' . $query . ']' );
+		}
+
+		if ( $resource instanceof mysqli_result )
+		{
+			$rows = array();
+			while ( !is_null( $row = $resource->fetch_assoc() ) )
+			{
+				$rows[] = $row;
+			}
+			$resource->free_result();
+			$result = $rows;
+		}
+		else
+		{
+			// sphinxql doesn't return insert_id because we always have to point it out ourselves!
+			$result = array(
+				$this->_driver->affected_rows );
+		}
+		return $result;
+	}
+
+	/**
+	 * Escapes the input with real_escape_string
+	 * Taken from FuelPHP and edited
+	 *
+	 * @param  string  $value  The string to escape
+	 *
+	 * @return  string  The escaped string
+	 * @throws  Miaox_Search_SphinxQl_Connection_Exception  If there was an error during the escaping
+	 */
+	public function escape( $value )
+	{
+		if ( !$this->isConnected() )
+		{
+			$this->connect();
+		}
+
+		if ( ( $value = $this->_driver->real_escape_string( ( string ) $value ) ) === false )
+		{
+			throw new Miaox_Search_SphinxQl_Connection_Exception( $this->_driver->error, $this->_driver->errno );
+		}
+
+		return "'" . $value . "'";
+	}
 }
