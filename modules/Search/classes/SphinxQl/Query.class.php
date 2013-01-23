@@ -747,7 +747,7 @@ abstract class Miaox_Search_SphinxQl_Query
 
 				if ( $order[ 'direction' ] !== null )
 				{
-					$order_sub[] = ( ( strtolower( $order[ 'direction' ] ) === 'desc' ) ? 'DESC' : 'ASC' );
+					$order_sub .= ( ( strtolower( $order[ 'direction' ] ) === 'desc' ) ? 'DESC' : 'ASC' );
 				}
 
 				$order_arr[] = $order_sub;
