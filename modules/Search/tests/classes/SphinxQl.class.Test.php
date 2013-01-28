@@ -107,9 +107,9 @@ class Miaox_Search_SphinxQl_Test extends PHPUnit_Framework_TestCase
 	{
 		$spinxql = $this->_sphinxql;
 		$actual = $spinxql->select( 'id' )->from( 'articles' )->where( 'id', 'IN', array(
-				1,
-				2,
-				3 ) );
+			1,
+			2,
+			3 ) );
 		$actual = $spinxql->compile()->getCompiled();
 		$expected = "SELECT `id` FROM `articles` WHERE id IN (1, 2, 3)";
 
@@ -124,11 +124,28 @@ class Miaox_Search_SphinxQl_Test extends PHPUnit_Framework_TestCase
 	{
 		$spinxql = $this->_sphinxql;
 		$actual = $spinxql->select( 'id' )->from( 'articles' )->where( 'id', 'BETWEEN', array(
-				1,
-				3 ) );
+			1,
+			3 ) );
 		$actual = $spinxql->compile()->getCompiled();
 		$expected = "SELECT `id` FROM `articles` WHERE `id` BETWEEN 1 AND 3";
 
+		$this->assertEquals( $expected, $actual );
+	}
+
+	public function testOrder()
+	{
+		$spinxql = $this->_sphinxql;
+		$actual = $spinxql->select()->from( 'articles' )->orderBy( 'group', Miaox_Search_SphinxQl::ORDER_ASC )->limit( 1 );
+		$actual = $spinxql->execute();
+		$expected = array(
+			0 => array(
+				'id' => '1',
+				'published' => '1132223498',
+				'group' => '45' ) );
+		$this->assertEquals( $expected, $actual );
+
+		$actual = $spinxql->getCompiled();
+		$expected = "SELECT * FROM `articles` ORDER BY `group` ASC LIMIT 0, 1";
 		$this->assertEquals( $expected, $actual );
 	}
 }

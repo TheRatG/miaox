@@ -571,7 +571,7 @@ abstract class Miaox_Search_SphinxQl_Query
 				$pre .= ' ';
 			}
 
-			$pieces[] = $this->escape( trim( $pre ) ) . ")";
+			$pieces[] = $this->_escape( trim( $pre ) ) . ")";
 		}
 
 		$result = '';
@@ -737,7 +737,7 @@ abstract class Miaox_Search_SphinxQl_Query
 
 		if ( !empty( $this->_orderBy ) )
 		{
-			$query[] = 'ORDER BY ';
+			$query[] = 'ORDER BY';
 
 			$order_arr = array();
 
@@ -747,7 +747,7 @@ abstract class Miaox_Search_SphinxQl_Query
 
 				if ( $order[ 'direction' ] !== null )
 				{
-					$order_sub .= ( ( strtolower( $order[ 'direction' ] ) === 'desc' ) ? 'DESC' : 'ASC' );
+					$order_sub .= ' ' . ( ( strtolower( $order[ 'direction' ] ) === 'desc' ) ? 'DESC' : 'ASC' );
 				}
 
 				$order_arr[] = $order_sub;
