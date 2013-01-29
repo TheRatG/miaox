@@ -67,7 +67,10 @@ class Miaox_SphinxQl extends Miaox_SphinxQl_Query
 			$str = self::$_showQueries[ $method ];
 			$list = $this->_query( $str );
 
-			$result = $this->processingResult( $list );
+			if ( is_array( $list ) )
+			{
+				$result = $this->processingResult( $list );
+			}
 		}
 		else
 		{

@@ -21,11 +21,19 @@ class Miaox_SphinxQl_Connection
 	 * @var string Port
 	 */
 	protected $_port;
+	protected $_multiQuery;
 
 	public function __construct( $host, $port )
 	{
 		$this->_host = $host;
 		$this->_port = $port;
+
+		$this->_multiQuery = true;
+		$config = Miao_Config::Libs( __CLASS__, false );
+		if ( $config )
+		{
+			$this->_multiQuery = (bool) $config->get( 'multiquery', 1 );
+		}
 	}
 
 	public function __destruct()
@@ -97,6 +105,10 @@ class Miaox_SphinxQl_Connection
 		{
 			$this->connect();
 		}
+		else
+		{
+			$this->ping();
+		}
 
 		$resource = $this->_driver->query( $query );
 
@@ -126,9 +138,26 @@ class Miaox_SphinxQl_Connection
 
 	public function multiQuery( $query )
 	{
+		if ( $this->_multiQuery )
+		{
+			$result = $this->_multiQuery( $query );
+		}
+		else
+		{
+			$result = $this->_emulateMultiQuery( $query );
+		}
+		return $result;
+	}
+
+	protected function _multiQuery( $query )
+	{
 		if ( !$this->isConnected() )
 		{
 			$this->connect();
+		}
+		else
+		{
+			$this->ping();
 		}
 
 		$this->_driver->multi_query( $query );
@@ -153,16 +182,20 @@ class Miaox_SphinxQl_Connection
 				$resource->free_result();
 			}
 
-			$continue = false;
+			$count++;
+		} while ( $this->_driver->next_result() );
 
-			if ( $this->_driver->more_results() )
-			{
-				$this->_driver->next_result();
-				$continue = true;
-				$count++;
-			}
-		} while ( $continue );
+		return $result;
+	}
 
+	protected function _emulateMultiQuery( $query )
+	{
+		$result = array();
+		$list = explode( ';', $query );
+		for( $i = 0, $cnt = count( $list ); $i < $cnt; $i++ )
+		{
+			$result[ $i ] = $this->query( $list[ $i ] );
+		}
 		return $result;
 	}
 
