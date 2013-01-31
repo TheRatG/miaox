@@ -36,6 +36,13 @@
 		<body>this is another document</body>
 		<tags>555 888</tags>
 	</sphinx:document>
+	<sphinx:document id="4">
+		<group>46</group>
+		<published>1132223498</published>
+		<title>3 header</title>
+		<body>body</body>
+		<tags>555 888</tags>
+	</sphinx:document>
 	<sphinx:document id="562949985560752">
 		<group>99</group>
 		<published>1132223498</published>

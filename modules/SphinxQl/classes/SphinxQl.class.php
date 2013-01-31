@@ -75,7 +75,7 @@ class Miaox_SphinxQl extends Miaox_SphinxQl_Query
 		else
 		{
 			$msg = sprintf( 'Method %s does not exists', $method );
-			throw new Miaox_Search_Exception( $msg );
+			throw new Miaox_SphinxQl_Exception( $msg );
 		}
 		return $result;
 	}

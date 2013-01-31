@@ -547,7 +547,8 @@ abstract class Miaox_SphinxQl_Query
 
 				if ( $match[ 'half' ] )
 				{
-					$pre .= $this->_halfEscapeMatch( $match[ 'value' ] );
+					//$pre .= $this->_halfEscapeMatch( $match[ 'value' ] );
+					$pre .= $match[ 'value' ];
 				}
 				else
 				{
@@ -557,7 +558,7 @@ abstract class Miaox_SphinxQl_Query
 				$pre .= ' ';
 			}
 
-			$pieces[] = $this->_escape( trim( $pre ) ) . ")";
+			$pieces[] = $this->_escape( trim( $pre ) ) . " )";
 		}
 
 		$result = '';
@@ -1045,7 +1046,7 @@ abstract class Miaox_SphinxQl_Query
 			return sprintf( '%F', $value );
 		}
 
-		return $this->escape( $value );
+		return $this->_escape( $value );
 	}
 
 	/**

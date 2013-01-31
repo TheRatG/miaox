@@ -22,17 +22,19 @@ class Miaox_SphinxQl_Test extends PHPUnit_Framework_TestCase
 		$actual = $spinxql->select( 'id' )->from( 'articles' )->execute();
 
 		$expected = array(
-			0 => array(
+			array(
 				'id' => '1' ),
-			1 => array(
+			array(
 				'id' => '2' ),
-			2 => array(
+			array(
 				'id' => '3' ),
-			3 => array(
+			array(
+				'id' => '4' ),
+			array(
 				'id' => '562949985559532' ),
-			4 => array(
+			array(
 				'id' => '562949985559552' ),
-			5 => array(
+			array(
 				'id' => '562949985560752' ) );
 
 		$this->assertEquals( $expected, $actual );
@@ -146,6 +148,34 @@ class Miaox_SphinxQl_Test extends PHPUnit_Framework_TestCase
 
 		$actual = $spinxql->getCompiled();
 		$expected = "SELECT * FROM `articles` ORDER BY `group` ASC LIMIT 0, 1";
+		$this->assertEquals( $expected, $actual );
+	}
+
+	public function testMatch()
+	{
+		$spinxql = $this->_sphinxql;
+		$spinxql->select()->from( 'articles' )->match( 'body', '^body$', true );
+		$actual = $spinxql->execute();
+		$expected = array(
+			0 => array(
+				'id' => '4',
+				'published' => '1132223498',
+				'group' => '46' ) );
+
+		$this->assertEquals( $expected, $actual );
+
+		$spinxql->select()->from( 'articles' )->match( 'body', 'body$', true );
+		$actual = $spinxql->execute();
+		$expected = array(
+			0 => array(
+				'id' => '1',
+				'published' => '1132223498',
+				'group' => '45' ),
+			1 => array(
+				'id' => '4',
+				'published' => '1132223498',
+				'group' => '46' ) );
+
 		$this->assertEquals( $expected, $actual );
 	}
 }
