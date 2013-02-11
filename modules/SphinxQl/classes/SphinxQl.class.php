@@ -111,7 +111,7 @@ class Miaox_SphinxQl extends Miaox_SphinxQl_Query
 	 * @throws Miaox_SphinxQl_Connection_Exception
 	 * @return Ambigous <multitype:, multitype:multitype: >
 	 */
-	public function executeBatch()
+	public function executeBatch( $clearQueue = true )
 	{
 		$queue = $this->_queue;
 		if ( count( $queue ) === 0 )
@@ -119,6 +119,10 @@ class Miaox_SphinxQl extends Miaox_SphinxQl_Query
 			throw new Miaox_SphinxQl_Connection_Exception( 'The Queue is empty.' );
 		}
 		$result = $this->_multiQuery( $queue );
+		if ( $result && $clearQueue )
+		{
+			$this->_queue = array();
+		}
 		return $result;
 	}
 

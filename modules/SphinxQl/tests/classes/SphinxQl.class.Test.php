@@ -151,7 +151,7 @@ class Miaox_SphinxQl_Test extends PHPUnit_Framework_TestCase
 		$this->assertEquals( $expected, $actual );
 	}
 
-	public function testMatch()
+	public function atestMatch()
 	{
 		$spinxql = $this->_sphinxql;
 		$spinxql->select()->from( 'articles' )->match( 'body', '^body$', true );
