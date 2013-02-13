@@ -147,6 +147,132 @@ class Miaox_SphinxQl extends Miaox_SphinxQl_Query
 	}
 
 	/**
+	 * CALL SNIPPETS syntax
+	 *
+	 * @example $opts
+	 * <code>
+	 * $opts = array(
+	 *	"before_match" => '<span class="find-text">',
+	 *	"after_match" => "</span>",
+	 *	"chunk_separator" => " ... ",
+	 *	"limit" => 200,
+	 *	"around" => 10 );
+	 * </code>
+	 *
+	 * @param string $data
+	 * @param string $index
+	 * @param array $extra
+	 *
+	 * @return array The result of the query
+	 */
+	public function callSnippets( $docs, $index, $query, $opts = array() )
+	{
+		$buildQuery = $this->_compileCallSnippets( $docs, $index, $query, $opts );
+		$queryResult = $this->_query( $buildQuery );
+		$result = array();
+
+		if ( !empty( $queryResult ) )
+		{
+			$i = 0;
+			if ( is_array( $docs ) )
+			{
+				foreach ( array_keys( $docs ) as $key )
+				{
+					$result[ $key ] = stripcslashes( current( $queryResult[ $i++ ] ) );
+				}
+			}
+			else
+			{
+				$result = stripcslashes( current( $queryResult[ $i ] ) );
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * CALL KEYWORDS syntax
+	 *
+	 * @param string $text
+	 * @param string $index
+	 * @param null|string $hits
+	 *
+	 * @return array The result of the query
+	 */
+	public function callKeywords( $text, $index, $hits = null )
+	{
+		$arr = array(
+			$text,
+			$index );
+		if ( $hits !== null )
+		{
+			$arr[] = $hits;
+		}
+
+		return $this->getConnection()->query( 'CALL KEYWORDS(' . implode( ', ', $this->getConnection()->quoteArr( $arr ) ) . ')' );
+	}
+
+	/**
+	 * DESCRIBE syntax
+	 *
+	 * @param string $index The name of the index
+	 *
+	 * @return array The result of the query
+	 */
+	public function describe( $index )
+	{
+		$query = 'DESCRIBE ' . $this->_quoteIdentifier( $index );
+		$result = $this->_query( $query );
+		return $result;
+	}
+
+	/**
+	 * SET syntax
+	 *
+	 * @param string $name The name of the variable
+	 * @param mixed $value The value o the variable
+	 * @param boolean $global True if the variable should be global, false otherwise
+	 *
+	 * @return array The result of the query
+	 */
+	public function setVariable( $name, $value, $global = false )
+	{
+		$query = 'SET ';
+
+		if ( $global )
+		{
+			$query .= 'GLOBAL ';
+		}
+
+		$user_var = strpos( $name, '@' ) === 0;
+
+		// if it has an @ it's a user variable and we can't wrap it
+		if ( $user_var )
+		{
+			$query .= $name . ' ';
+		}
+		else
+		{
+			$query .= $this->_quoteIdentifier( $name ) . ' ';
+		}
+
+		// user variables must always be processed as arrays
+		if ( $user_var && !is_array( $value ) )
+		{
+			$query .= '= (' . $this->_quote( $value ) . ')';
+		}
+		elseif ( is_array( $value ) )
+		{
+			$query .= '= (' . implode( ', ', $this->_quoteArr( $value ) ) . ')';
+		}
+		else
+		{
+			$query .= '= ' . $this->_quote( $value );
+		}
+
+		$this->_query( $query );
+	}
+
+	/**
 	 * Escapes the input with real_escape_string
 	 * Taken from FuelPHP and edited
 	 *
@@ -192,7 +318,7 @@ class Miaox_SphinxQl extends Miaox_SphinxQl_Query
 		$result = null;
 		try
 		{
-			$query = implode( ';', $queue );
+			$query = implode( '; ', $queue ) . ';';
 			$this->getLog()->debug( $query );
 			$result = $this->_connection->multiQuery( $query );
 			$msg = sprintf( 'Result cnt: %d', count( $result ) );

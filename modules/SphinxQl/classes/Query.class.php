@@ -543,7 +543,10 @@ abstract class Miaox_SphinxQl_Query
 
 			foreach ( $this->_match as $match )
 			{
-				$pre .= '@' . $match[ 'column' ] . ' ';
+				if ( !empty( $match[ 'column' ] ) )
+				{
+					$pre .= '@' . $match[ 'column' ] . ' ';
+				}
 
 				if ( $match[ 'half' ] )
 				{
@@ -1065,6 +1068,33 @@ abstract class Miaox_SphinxQl_Query
 			$result[ $key ] = $this->_quote( $item );
 		}
 
+		return $result;
+	}
+
+	protected function _compileCallSnippets( $docs, $index, $query, $opts )
+	{
+		if ( !is_array( $docs ) )
+		{
+			$docs = array(
+				$docs );
+		}
+		$buildQuery = '';
+		$args = array();
+		$parts = array();
+		foreach ( $docs as $key => $item )
+		{
+			$parts[] = $this->_quote( $item );
+		}
+		$args[] = '( ' . implode( ', ', $parts ) . ' )';
+		$args[] = "'" . $index . "'";
+		$args[] = "'" . $query . "'";
+		foreach ( $opts as $optKey => $optValue )
+		{
+			$optValue = $this->_quote( $optValue );
+			$args[] = $optValue . " AS " . $optKey;
+		}
+		$args = implode( ', ', $args );
+		$result = sprintf( 'CALL SNIPPETS( %s )', $args );
 		return $result;
 	}
 
