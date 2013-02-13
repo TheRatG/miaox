@@ -734,7 +734,6 @@ abstract class Miaox_SphinxQl_Query
 			foreach ( $this->_orderBy as $order )
 			{
 				$order_sub = $this->_quoteIdentifier( $order[ 'column' ] );
-
 				if ( $order[ 'direction' ] !== null )
 				{
 					$order_sub .= ' ' . ( ( strtolower( $order[ 'direction' ] ) === 'desc' ) ? 'DESC' : 'ASC' );
@@ -997,13 +996,12 @@ abstract class Miaox_SphinxQl_Query
 			return $value->value();
 		}
 
-		if ( $value === '*' )
+		if ( $value === '*' ||  $value[0] == '@' )
 		{
 			return $value;
 		}
 
 		$pieces = explode( '.', $value );
-
 		foreach ( $pieces as $key => $piece )
 		{
 			$pieces[ $key ] = '`' . $piece . '`';
