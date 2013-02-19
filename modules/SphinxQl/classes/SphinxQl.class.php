@@ -33,6 +33,11 @@ class Miaox_SphinxQl extends Miaox_SphinxQl_Query
 	 * @var Miaox_SphinxQl_Connection
 	 */
 	protected $_connection;
+
+	/**
+	 *
+	 * @var array
+	 */
 	protected $_queue = array();
 
 	public function getLog()

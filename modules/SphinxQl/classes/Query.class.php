@@ -3,7 +3,7 @@
  * @author vpak
  * @date 2013-01-22 09:45:27
  */
-abstract class Miaox_SphinxQl_Query
+class Miaox_SphinxQl_Query
 {
 	/**
 	 * The last compiled query
@@ -674,7 +674,19 @@ abstract class Miaox_SphinxQl_Query
 
 			if ( !empty( $this->_select ) )
 			{
-				$query[] = implode( ', ', $this->_quoteIdentifierArr( $this->_select ) );
+				$selTmp = array();
+				foreach ( $this->_select as $selItem )
+				{
+					if ( false !== strpos( $selItem, '(' ) || false !== stripos( $selItem, 'as' ) )
+					{
+						$selTmp[] = $selItem;
+					}
+					else
+					{
+						$selTmp[] = $this->_quoteIdentifier( $selItem );
+					}
+				}
+				$query[] = implode( ', ', $selTmp );
 			}
 			else
 			{
@@ -996,7 +1008,7 @@ abstract class Miaox_SphinxQl_Query
 			return $value->value();
 		}
 
-		if ( $value === '*' ||  $value[0] == '@' )
+		if ( $value === '*' || $value[ 0 ] == '@' )
 		{
 			return $value;
 		}
