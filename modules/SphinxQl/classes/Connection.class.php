@@ -192,6 +192,7 @@ class Miaox_SphinxQl_Connection
 	{
 		$result = array();
 		$list = explode( ';', $query );
+		$list = array_filter( $list );
 		for( $i = 0, $cnt = count( $list ); $i < $cnt; $i++ )
 		{
 			$result[ $i ] = $this->query( $list[ $i ] );
