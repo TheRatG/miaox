@@ -641,7 +641,19 @@ class Miaox_SphinxQl_Query
 
 					if ( strtoupper( $where[ 'operator' ] ) === 'IN' )
 					{
+						if ( !is_array( $where[ 'value' ] ) )
+						{
+							$where[ 'value' ] = array( $where[ 'value' ] );
+						}
 						$pieces[] = 'IN (' . implode( ', ', $this->_quoteArr( $where[ 'value' ] ) ) . ')';
+					}
+					if ( strtoupper( $where[ 'operator' ] ) === 'NOT IN' )
+					{
+						if ( !is_array( $where[ 'value' ] ) )
+						{
+							$where[ 'value' ] = array( $where[ 'value' ] );
+						}
+						$pieces[] = 'NOT IN (' . implode( ', ', $this->_quoteArr( $where[ 'value' ] ) ) . ')';
 					}
 					else
 					{
