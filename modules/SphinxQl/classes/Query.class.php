@@ -647,7 +647,7 @@ class Miaox_SphinxQl_Query
 						}
 						$pieces[] = 'IN (' . implode( ', ', $this->_quoteArr( $where[ 'value' ] ) ) . ')';
 					}
-					if ( strtoupper( $where[ 'operator' ] ) === 'NOT IN' )
+					else if ( strtoupper( $where[ 'operator' ] ) === 'NOT IN' )
 					{
 						if ( !is_array( $where[ 'value' ] ) )
 						{
