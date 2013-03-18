@@ -26,13 +26,17 @@ Alternative syntax of getting result
 ```php
 $result = $sphinxql->execute();
 $meta = $sphinxql->meta();
-
+```
+OR
+```php
+$result = array();
+$meta = array();
 $sphinxql->enqueue();
 $sphinxql->enqueue( Miaox_SphinxQl::SHOW_META );
 $resultBatch = $sphinxql->executeBatch();
 if ( $resultBatch && isset( $resultBatch[ 0 ], $resultBatch[ 1 ] ) )
 {
-  $result = $resultBatch[ 0 ];
+	$result = $resultBatch[ 0 ];
 	$meta = $sphinxql->processingResult( $resultBatch[ 1 ] );
 }
 ```
