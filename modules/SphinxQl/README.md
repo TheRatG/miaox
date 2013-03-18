@@ -1,4 +1,6 @@
-# Main funtions
+http://sphinxsearch.com/docs/2.0.2/sphinxql-reference.html
+
+# Main functions
 * execute( string $query = null )
 
 * enqueue( string $query = null )
