@@ -12,6 +12,8 @@
 
 ## SELECT
 
+http://sphinxsearch.com/docs/2.0.2/sphinxql-select.html
+
 * select()
 * from()
 * match()
