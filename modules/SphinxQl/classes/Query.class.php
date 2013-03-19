@@ -413,7 +413,7 @@ class Miaox_SphinxQl_Query
 		}
 		else
 		{
-			$this->_columns =\func_get_args();
+			$this->_columns = \func_get_args();
 		}
 
 		return $this;
@@ -436,7 +436,7 @@ class Miaox_SphinxQl_Query
 		}
 		else
 		{
-			$this->_values[] =\func_get_args();
+			$this->_values[] = \func_get_args();
 		}
 
 		return $this;
@@ -540,25 +540,18 @@ class Miaox_SphinxQl_Query
 			$pieces[] = "MATCH(";
 
 			$pre = '';
+			foreach ( $this->_match as $key => $match )
+			{
+				if ( '' === $match['column'] )
+				{
+					$pre .= $this->_compileMatchItem($match);
+					unset( $this->_match[ $key ] );
+				}
+			}
 
 			foreach ( $this->_match as $match )
 			{
-				if ( !empty( $match[ 'column' ] ) )
-				{
-					$pre .= '@' . $match[ 'column' ] . ' ';
-				}
-
-				if ( $match[ 'half' ] )
-				{
-					//$pre .= $this->_halfEscapeMatch( $match[ 'value' ] );
-					$pre .= $match[ 'value' ];
-				}
-				else
-				{
-					$pre .= $this->_escapeMatch( $match[ 'value' ] );
-				}
-
-				$pre .= ' ';
+				$pre .= $this->_compileMatchItem($match);
 			}
 
 			$pieces[] = $this->_escape( trim( $pre ) ) . " )";
@@ -569,6 +562,27 @@ class Miaox_SphinxQl_Query
 		{
 			$result = implode( ' ', $pieces );
 		}
+		return $result;
+	}
+
+	protected function _compileMatchItem( $match )
+	{
+		$result = '';
+		if ( !empty( $match[ 'column' ] ) )
+		{
+			$result .= '@' . $match[ 'column' ] . ' ';
+		}
+
+		if ( $match[ 'half' ] )
+		{
+			$result .= $match[ 'value' ];
+		}
+		else
+		{
+			$result .= $this->_escapeMatch( $match[ 'value' ] );
+		}
+
+		$result .= ' ';
 		return $result;
 	}
 
@@ -643,7 +657,8 @@ class Miaox_SphinxQl_Query
 					{
 						if ( !is_array( $where[ 'value' ] ) )
 						{
-							$where[ 'value' ] = array( $where[ 'value' ] );
+							$where[ 'value' ] = array(
+								$where[ 'value' ] );
 						}
 						$pieces[] = 'IN (' . implode( ', ', $this->_quoteArr( $where[ 'value' ] ) ) . ')';
 					}
@@ -651,7 +666,8 @@ class Miaox_SphinxQl_Query
 					{
 						if ( !is_array( $where[ 'value' ] ) )
 						{
-							$where[ 'value' ] = array( $where[ 'value' ] );
+							$where[ 'value' ] = array(
+								$where[ 'value' ] );
 						}
 						$pieces[] = 'NOT IN (' . implode( ', ', $this->_quoteArr( $where[ 'value' ] ) ) . ')';
 					}
