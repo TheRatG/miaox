@@ -545,13 +545,15 @@ class Miaox_SphinxQl_Query
 				if ( '' === $match['column'] )
 				{
 					$pre .= $this->_compileMatchItem($match);
-					unset( $this->_match[ $key ] );
 				}
 			}
 
 			foreach ( $this->_match as $match )
 			{
-				$pre .= $this->_compileMatchItem($match);
+				if ( '' !== $match['column'] )
+				{
+					$pre .= $this->_compileMatchItem($match);
+				}
 			}
 
 			$pieces[] = $this->_escape( trim( $pre ) ) . " )";
