@@ -198,11 +198,10 @@ class Miaox_SphinxQl_Query
 	 * @param  string   $column    The column name
 	 * @param  string   $operator  The operator to use
 	 * @param  string   $value     The value to check against
-	 * @param  boolean  $or        If it should be prepended with OR (true) or AND (false) - not available as for Sphinx 2.0.2
 	 *
 	 * @return  Miaox_SphinxQl_Query  The current object
 	 */
-	public function where( $column, $operator, $value = null, $or = false )
+	public function where( $column, $operator, $value = null )
 	{
 		if ( $value === null )
 		{
@@ -211,7 +210,7 @@ class Miaox_SphinxQl_Query
 		}
 
 		$this->_where[] = array(
-			'ext_operator' => $or ? 'OR' : 'AND',
+			'ext_operator' => 'AND',
 			'column' => $column,
 			'operator' => $operator,
 			'value' => $value );
@@ -1153,6 +1152,7 @@ class Miaox_SphinxQl_Query
 		$this->_columns = array();
 		$this->_values = array();
 		$this->_set = array();
-		$this->_options = array();
+
+		//$this->_options = array();
 	}
 }
