@@ -3,6 +3,10 @@
  * @author vpak
  * @date 2013-01-22 09:45:41
  */
+
+require_once realpath( __DIR__ . '/../../' ) . '/Exceptionizer/classes/Exceptionizer.class.php';
+require_once 'Connection/Exception.class.php';
+
 class Miaox_SphinxQl_Connection
 {
 	/**
@@ -29,11 +33,6 @@ class Miaox_SphinxQl_Connection
 		$this->_port = $port;
 
 		$this->_multiQuery = true;
-		$config = Miao_Config::Libs( __CLASS__, false );
-		if ( $config )
-		{
-			$this->_multiQuery = (bool) $config->get( 'multiquery', 1 );
-		}
 	}
 
 	public function __destruct()
@@ -41,11 +40,12 @@ class Miaox_SphinxQl_Connection
 		unset( $this->_driver );
 	}
 
-	/**
-	 * Establishes connection to SphinxQL with MySQLi
-	 * @param unknown_type $suppressError
-	 */
-	public function connect()
+    /**
+     * Establishes connection to SphinxQL with MySQLi
+     * @return bool
+     * @throws Miaox_SphinxQl_Connection_Exception
+     */
+    public function connect()
 	{
 		$exceptionizer = new Miaox_Exceptionizer( E_ALL );
 		try
@@ -170,7 +170,7 @@ class Miaox_SphinxQl_Connection
 		$count = 0;
 		do
 		{
-			if ( FALSE !== ( $resource = $this->_driver->store_result() ) )
+			if ( false !== ( $resource = $this->_driver->store_result() ) )
 			{
 				$result[ $count ] = array();
 

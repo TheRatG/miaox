@@ -1,8 +1,20 @@
-http://sphinxsearch.com/docs/2.0.2/sphinxql-reference.html
+# Overview
+Query builder module for SphinxQl.
+
+* download [Miaox](https://github.com/TheRatG/miaox/archive/master.zip)
+* unpack and copy direcotry `modules/SphinxQl`, if you don't use miao framework
+* read examples, relax and enjoy
+
+## Why?
+1. SphinxQl is faster than SphinxAPI, you can check in [SphinxAPI vs SphinxQL benchmark](http://sphinxsearch.com/blog/2010/04/25/sphinxapi-vs-sphinxql-benchmark)
+2. Query is easier for understand, see for [SphinxQL reference](http://sphinxsearch.com/docs/2.0.2/sphinxql-reference.html)
+
+## Why not?
+1. You need [php mysqli extension](http://php.net/manual/en/book.mysqli.php)
 
 # Examples
 
-Search articles ids and meta info example:
+Search articles ids and meta info example
 
 ```php
 $host = '127.0.0.1';
@@ -14,7 +26,7 @@ $sphinxql->select()
   ->from( 'articles', 'articles_delta' )
 	->match( 'body', 'test' )
 	->where( 'is_valid', 1 )
-	->where( 'type', Miaox_SphinxQl::QUERY_IN, array( 1, 2, 3 ) )
+	->where( 'type', Miaox_SphinxQl::IN, array( 1, 2, 3 ) )
 	->orderBy( 'publish_date' )
 	->limit( 2, 2 );
 
@@ -22,12 +34,15 @@ $meta = array();
 $result = $sphinxql->execute( null, $meta );
 ```
 
-Alternative syntax of getting result
+Alternative syntax of getting result, but you make two requests to searchd
+
 ```php
 $result = $sphinxql->execute();
 $meta = $sphinxql->meta();
 ```
-OR
+
+Or multiquery version with one request to searchd
+
 ```php
 $result = array();
 $meta = array();

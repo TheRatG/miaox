@@ -1,35 +1,45 @@
 <?php
-/*
- * Don't forget run ./scripts/sphinx.sh start
+/**
+ * Queue.class.Test.php.
+ * @author: vpak <TheRatW@gmail.com>
+ * @date: 03.04.13 11:56
 */
-class Miaox_SphinxQl_Queue_Test extends PHPUnit_Framework_TestCase
+require_once 'Helper.class.Test.php';
+
+class Miaox_SphinxQl_Queue_Test extends Miaox_SphinxQl_Helper_Test
 {
-	protected $_sphinxql;
+    /**
+     * @var Miaox_SphinxQl
+     */
+    private $_sphinxQl;
 
-	public function setUp()
-	{
-		$this->_sphinxql = new Miaox_SphinxQl( '127.0.0.1', 4499 );
-	}
+    public function setUp()
+    {
+        $this->_sphinxQl = new Miaox_SphinxQl( SEARCHD_HOST, SEARCHD_PORT );
+    }
 
-	public function tearDown()
-	{
-		unset( $this->_sphinxql );
-	}
+    public function tearDown()
+    {
+        unset( $this->_sphinxQl );
+    }
 
-	public function testExecute()
-	{
-		$this->_sphinxql->select( 'group' )->from( 'articles' )->where( 'id', 1 )->enqueue();
-		$this->_sphinxql->select( 'group' )->from( 'articles' )->where( 'id', 2 )->enqueue();
+    public function testExecuteMeta()
+    {
+        $search = $this->_sphinxQl;
+        $search->select()
+            ->from( 'articles', 'articles_delta' )
+            ->match( 'body', 'test' )
+            ->where( 'is_valid', 1 )
+            ->where( 'type', Miaox_SphinxQl::IN, array( 1, 2, 3 ) )
+            ->orderBy( 'publish_date' )
+            ->limit( 2, 2 );
 
-		$actual = $this->_sphinxql->executeBatch();
-		$expected = array(
-			0 => array(
-				0 => array(
-					'group' => '45' ) ),
-			1 => array(
-				0 => array(
-					'group' => '46' ) ) );
+        $meta = array();
+        $result = $search->execute( null, $meta );
 
-		$this->assertEquals( $expected, $actual );
-	}
+        // --- dump ---
+        echo __FILE__ . __METHOD__ . chr( 10 );
+        var_dump( $result ) . chr( 10 );
+        // --- // ---
+    }
 }

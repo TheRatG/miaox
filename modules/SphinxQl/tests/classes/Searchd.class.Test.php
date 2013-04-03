@@ -3,7 +3,7 @@
  * Searchd.class.Test.php.
  * @author: vpak <TheRatW@gmail.com>
  * @date: 27.03.13 10:00
-*/
+ */
 require_once __DIR__ . '/../scripts/config.php';
 class Miaox_SphinxQl_Searchd_Test
 {
@@ -34,13 +34,14 @@ class Miaox_SphinxQl_Searchd_Test
         $cmd[ ] = sprintf( '%s --config %s', $this->_binSearchd, $this->_getSphinxConfFilename() );
 
         $cmd = implode( ' && ', $cmd );
-        exec ( $cmd );
+        sleep( 1 );
+        exec( $cmd );
     }
 
     public function stop()
     {
         $cmd = sprintf( '%s --config %s --stop', $this->_binSearchd, $this->_getSphinxConfFilename() );
-        exec ( $cmd );
+        exec( $cmd );
     }
 
     protected function _makeSphinxConf()

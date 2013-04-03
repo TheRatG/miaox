@@ -14,6 +14,8 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
 
     private $_match = array( array(), array() );
 
+    private $_orderBy = array();
+
     public function setAttributes( array $attributes = array() )
     {
         $this->_attributes = $attributes;
@@ -60,12 +62,20 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
         }
     }
 
+    public function addOrderBy( $column, $direction )
+    {
+        $item = array( 'column' => $column, 'direction' => $direction );
+        $this->_orderBy[ ] = $item;
+    }
+
     public function compile()
     {
         $queryString = array();
         $queryString[ ] = $this->_buildSelect();
         $queryString[ ] = $this->_buildFrom();
         $queryString[ ] = $this->_buildWhere();
+        $queryString[ ] = $this->_buildOrderBy();
+        $queryString = array_filter( $queryString );
         $this->setQueryString( implode( ' ', $queryString ) );
         return parent::compile();
     }
@@ -128,7 +138,7 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
     {
         $result = array();
 
-        if ( !empty( $this->_where ) || !empty( $this->_match ) )
+        if ( !empty( $this->_where ) || !$this->_isMatchEmpty() )
         {
             $result[ ] = 'WHERE';
 
@@ -143,6 +153,18 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
             }
         }
         $result = implode( ' ', $result );
+        return $result;
+    }
+
+    protected function _buildOrderBy()
+    {
+        $result = '';
+        if ( !empty( $this->_orderBy ) )
+        {
+            $result = array();
+            $result = implode( ', ', $result );
+            $result = 'ORDER BY ' . $result;
+        }
         return $result;
     }
 
@@ -229,7 +251,7 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
     protected function _isMatchEmpty()
     {
         $result = true;
-        if ( count( $this->_match[0] ) || count( $this->_match[1] ) )
+        if ( count( $this->_match[ 0 ] ) || count( $this->_match[ 1 ] ) )
         {
             $result = false;
         }

@@ -121,4 +121,6 @@ class Miaox_SphinxQl_Where_Test extends Miaox_SphinxQl_Helper_Test
 
         $this->assertEquals( $expected, $actual );
     }
+
+
 }
