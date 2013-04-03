@@ -88,7 +88,7 @@ class Miaox_SphinxQl_Match_Test extends Miaox_SphinxQl_Helper_Test
             2 => array(
                 'id' => '4',
                 'publish_date' => '1364017800',
-                'type' => '1',
+                'type' => '2',
             ),
         );
         $this->assertEquals( $expected, $actual );

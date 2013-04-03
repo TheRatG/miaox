@@ -162,6 +162,14 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
         if ( !empty( $this->_orderBy ) )
         {
             $result = array();
+
+            foreach ( $this->_orderBy as $item )
+            {
+                $column = $item[ 'column' ];
+                $direction = $item[ 'direction' ];
+
+                $result[ ] = sprintf( '`%s` %s', $column, $direction );
+            }
             $result = implode( ', ', $result );
             $result = 'ORDER BY ' . $result;
         }

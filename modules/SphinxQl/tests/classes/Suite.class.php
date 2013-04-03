@@ -29,7 +29,7 @@ class Miaox_SphinxQl_Suite extends PHPUnit_Framework_TestSuite
         $suite->addTestSuite( 'Miaox_SphinxQl_Select_Test' );
 
         $suite->addTestSuite( 'Miaox_SphinxQl_Where_Test' );
-//        $suite->addTestSuite( 'Miaox_SphinxQl_Order_Test' );
+        $suite->addTestSuite( 'Miaox_SphinxQl_Order_Test' );
 //        $suite->addTestSuite( 'Miaox_SphinxQl_Queue_Test' );
         $suite->addTestSuite( 'Miaox_SphinxQl_Test' );
         return $suite;
