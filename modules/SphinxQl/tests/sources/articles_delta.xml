@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sphinx:docset>
+
+    <sphinx:schema>
+        <sphinx:field name="title" />
+        <sphinx:field name="body" />
+        <sphinx:field name="tags" />
+        <sphinx:field name="is_valid" type="bool" />
+        <sphinx:attr
+                name="publish_date"
+                type="timestamp" />
+        <sphinx:attr
+                name="type"
+                type="int"
+                bits="16"
+                default="1" />
+    </sphinx:schema>
+
+    <sphinx:document id="100">
+        <title>article delta 100</title>
+        <body>this is body delta 100</body>
+        <tags>555</tags>
+        <is_valid>1</is_valid>
+        <publish_date>1364104200</publish_date>
+        <type>1</type>
+    </sphinx:document>
+
+</sphinx:docset>
