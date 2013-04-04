@@ -11,6 +11,11 @@ class Miaox_SphinxQl_Helper_Test extends PHPUnit_Framework_TestCase
      */
     static private $_searchd;
 
+    /**
+     * @var Miaox_SphinxQl
+     */
+    protected $_sphinxQl;
+
     static function setUpBeforeClass()
     {
         self::$_searchd = new Miaox_SphinxQl_Searchd_Test( MODULE_ROOT, SEARCHD_HOST, SEARCHD_PORT, BIN_SEARCHD, BIN_INDEXER );
@@ -20,5 +25,15 @@ class Miaox_SphinxQl_Helper_Test extends PHPUnit_Framework_TestCase
     static public function tearDownAfterClass()
     {
         self::$_searchd->stop();
+    }
+
+    public function setUp()
+    {
+        $this->_sphinxQl = new Miaox_SphinxQl( SEARCHD_HOST, SEARCHD_PORT );
+    }
+
+    public function tearDown()
+    {
+        unset( $this->_sphinxQl );
     }
 }

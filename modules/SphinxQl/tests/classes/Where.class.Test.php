@@ -9,21 +9,6 @@ require_once 'Helper.class.Test.php';
 class Miaox_SphinxQl_Where_Test extends Miaox_SphinxQl_Helper_Test
 {
     /**
-     * @var Miaox_SphinxQl
-     */
-    private $_sphinxQl;
-
-    public function setUp()
-    {
-        $this->_sphinxQl = new Miaox_SphinxQl( SEARCHD_HOST, SEARCHD_PORT );
-    }
-
-    public function tearDown()
-    {
-        unset( $this->_sphinxQl );
-    }
-
-    /**
      * WHERE `column` = 'value'
      * ->where('column', 'value');
      */
@@ -34,9 +19,7 @@ class Miaox_SphinxQl_Where_Test extends Miaox_SphinxQl_Helper_Test
             ->select( 'id' )
             ->from( 'articles' )
             ->where( 'id', 1 );
-        $actual = $query
-            ->compile()
-            ->getCompiled();
+        $actual = $query->compile();
         $expected = 'SELECT `id` FROM `articles` WHERE id = 1';
 
         $this->assertEquals( $expected, $actual );
@@ -46,9 +29,7 @@ class Miaox_SphinxQl_Where_Test extends Miaox_SphinxQl_Helper_Test
             ->select()
             ->from( 'articles' )
             ->where( 'group', 1 );
-        $actual = $query
-            ->compile()
-            ->getCompiled();
+        $actual = $query->compile();
         $expected = 'SELECT * FROM `articles` WHERE `group` = 1';
 
         $this->assertEquals( $expected, $actual );
@@ -65,9 +46,7 @@ class Miaox_SphinxQl_Where_Test extends Miaox_SphinxQl_Helper_Test
             ->select( 'id' )
             ->from( 'articles' )
             ->where( 'id', '>=', 1 );
-        $actual = $query
-            ->compile()
-            ->getCompiled();
+        $actual = $query->compile();
         $expected = 'SELECT `id` FROM `articles` WHERE id >= 1';
 
         $this->assertEquals( $expected, $actual );
@@ -84,15 +63,13 @@ class Miaox_SphinxQl_Where_Test extends Miaox_SphinxQl_Helper_Test
             ->select( 'id' )
             ->from( 'articles' )
             ->where(
-            'id', 'IN', array(
-                             1,
-                             2,
-                             3
-                        )
-        );
-        $actual = $query
-            ->compile()
-            ->getCompiled();
+                'id', 'IN', array(
+                                 1,
+                                 2,
+                                 3
+                            )
+            );
+        $actual = $query->compile();
         $expected = "SELECT `id` FROM `articles` WHERE id IN ( 1, 2, 3 )";
 
         $this->assertEquals( $expected, $actual );
@@ -109,18 +86,14 @@ class Miaox_SphinxQl_Where_Test extends Miaox_SphinxQl_Helper_Test
             ->select( 'id' )
             ->from( 'articles' )
             ->where(
-            'id', 'BETWEEN', array(
-                                  1,
-                                  3
-                             )
-        );
-        $actual = $query
-            ->compile()
-            ->getCompiled();
+                'id', 'BETWEEN', array(
+                                      1,
+                                      3
+                                 )
+            );
+        $actual = $query->compile();
         $expected = "SELECT `id` FROM `articles` WHERE id BETWEEN 1 AND 3";
 
         $this->assertEquals( $expected, $actual );
     }
-
-
 }

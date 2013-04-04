@@ -8,21 +8,6 @@ require_once 'Helper.class.Test.php';
 
 class Miaox_SphinxQl_Match_Test extends Miaox_SphinxQl_Helper_Test
 {
-    /**
-     * @var Miaox_SphinxQl
-     */
-    private $_sphinxQl;
-
-    public function setUp()
-    {
-        $this->_sphinxQl = new Miaox_SphinxQl( SEARCHD_HOST, SEARCHD_PORT );
-    }
-
-    public function tearDown()
-    {
-        unset( $this->_sphinxQl );
-    }
-
     public function testMatchScan()
     {
         $search = $this->_sphinxQl;
@@ -37,6 +22,7 @@ class Miaox_SphinxQl_Match_Test extends Miaox_SphinxQl_Helper_Test
                 'id' => '2',
                 'publish_date' => '1363845000',
                 'type' => '1',
+                'is_valid' => '1'
             ),
         );
         $this->assertEquals( $expected, $actual );
@@ -64,6 +50,7 @@ class Miaox_SphinxQl_Match_Test extends Miaox_SphinxQl_Helper_Test
                 'id' => '1',
                 'publish_date' => '1132223498',
                 'type' => '1',
+                'is_valid' => '1'
             ),
         );
         $this->assertEquals( $expected, $actual );
@@ -79,16 +66,19 @@ class Miaox_SphinxQl_Match_Test extends Miaox_SphinxQl_Helper_Test
                 'id' => '1',
                 'publish_date' => '1132223498',
                 'type' => '1',
+                'is_valid' => '1'
             ),
             1 => array(
                 'id' => '2',
                 'publish_date' => '1363845000',
                 'type' => '1',
+                'is_valid' => '1'
             ),
             2 => array(
                 'id' => '4',
                 'publish_date' => '1364017800',
                 'type' => '2',
+                'is_valid' => '1'
             ),
         );
         $this->assertEquals( $expected, $actual );
@@ -116,6 +106,7 @@ class Miaox_SphinxQl_Match_Test extends Miaox_SphinxQl_Helper_Test
                 'id' => '1',
                 'publish_date' => '1132223498',
                 'type' => '1',
+                'is_valid' => '1'
             ),
         );
         $this->assertEquals( $expected, $actual );
@@ -134,6 +125,7 @@ class Miaox_SphinxQl_Match_Test extends Miaox_SphinxQl_Helper_Test
                 'id' => '6',
                 'publish_date' => '1364194200',
                 'type' => '4',
+                'is_valid' => '1'
             ),
         );
         $this->assertEquals( $expected, $actual );
@@ -152,6 +144,7 @@ class Miaox_SphinxQl_Match_Test extends Miaox_SphinxQl_Helper_Test
                 'id' => '5',
                 'publish_date' => '1364107800',
                 'type' => '3',
+                'is_valid' => '1'
             ),
         );
         $this->assertEquals( $expected, $actual );

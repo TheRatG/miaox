@@ -25,6 +25,20 @@ class Miaox_SphinxQl
      */
     const ORDER_DESC = 'DESC';
 
+    const SHOW_META = 'SHOW META';
+
+    const SHOW_WARNINGS = 'SHOW WARNINGS';
+
+    const SHOW_STATUS = 'SHOW STATUS';
+
+    const SHOW_TABLES = 'SHOW TABLES';
+
+    const SHOW_VARIABLES = 'SHOW VARIABLES';
+
+    const SHOW_SESSION_VARIABLES = 'SHOW SESSION VARIABLES';
+
+    const SHOW_GLOBAL_VARIABLES = 'SHOW GLOBAL VARIABLES';
+
     /**
      * @var Miaox_SphinxQl_Connection
      */
@@ -34,6 +48,15 @@ class Miaox_SphinxQl
      * @var Miaox_SphinxQl_Query
      */
     protected $_query;
+
+    protected $_queue = array();
+
+    protected $_globalOptions = array();
+
+    public function __construct( $host, $port )
+    {
+        $this->_connection = new Miaox_SphinxQl_Connection( $host, $port );
+    }
 
     /**
      * @param $name
@@ -56,10 +79,11 @@ class Miaox_SphinxQl
         return $result;
     }
 
-    public function __construct( $host, $port )
+    public function setGlobalOption( $option, $value )
     {
-        $this->_connection = new Miaox_SphinxQl_Connection( $host, $port );
-
+        assert( is_scalar( $option ) );
+        assert( is_scalar( $option ) );
+        $this->_globalOptions[ $option ] = $value;
     }
 
     public function select()
@@ -67,6 +91,15 @@ class Miaox_SphinxQl
         $this->_query = new Miaox_SphinxQl_Query_Select( $this );
         $attributes = Miaox_SphinxQl_Query::pivotArray( func_get_args() );
         $this->_query->setAttributes( $attributes );
+
+        if ( !empty( $this->_globalOptions ) )
+        {
+            foreach ( $this->_globalOptions as $option => $value )
+            {
+                $this->option( $option, $value );
+            }
+        }
+
         return $this;
     }
 
@@ -105,20 +138,94 @@ class Miaox_SphinxQl
         return $this;
     }
 
+    public function option( $option, $value )
+    {
+        $this->_query->setOption( $option, $value );
+        return $this;
+    }
+
+    /**
+     * Work like SQL limit: LIMIT [offset,] row_count
+     * @param $offset
+     * @param null $rowCount
+     * @return $this
+     */
+    public function limit( $offset, $rowCount = null )
+    {
+        if ( is_null( $rowCount ) )
+        {
+            $this->_query->setRowCount( $offset );
+        }
+        else
+        {
+            $this->_query->setOffset( $offset );
+            $this->_query->setRowCount( $rowCount );
+        }
+        return $this;
+    }
+
     public function compile()
     {
         return $this->_query->compile();
     }
 
-    public function getCompiled()
+    public function execute( $query = null, &$meta = null )
     {
-        return $this->_query->getCompiled();
+        if ( empty( $query ) )
+        {
+            $query = $this->compile();
+        }
+        if ( !is_null( $meta ) )
+        {
+            $this->enqueue();
+            $this->enqueue( Miaox_SphinxQl::SHOW_META );
+            $resultBatch = $this->executeBatch();
+            if ( $resultBatch && isset( $resultBatch[ 0 ], $resultBatch[ 1 ] ) )
+            {
+                $result = $resultBatch[ 0 ];
+                $meta = $this->processingResult( $resultBatch[ 1 ] );
+            }
+        }
+        else
+        {
+            $result = $this->_connection->query( $query );
+        }
+        return $result;
     }
 
-    public function execute()
+    public function enqueue( $query = null )
     {
-        $query = $this->compile()->getCompiled();
-        $result = $this->_connection->query( $query );
+        if ( empty( $query ) )
+        {
+            $query = $this->compile();
+        }
+        $this->_queue[ ] = $query;
+    }
+
+    public function executeBatch()
+    {
+        $query = implode( ';', $this->_queue );
+        $result = $this->_connection->multiQuery( $query );
+        return $result;
+    }
+
+    /**
+     * Processing result from info query, for example "SHOW META"
+     * @param array $list
+     * @return array
+     */
+    public function processingResult( array $list )
+    {
+        $result = array();
+        if ( is_array( $list ) && !empty( $list ) )
+        {
+            foreach ( $list as $item )
+            {
+                $index = current( $item );
+                $value = next( $item );
+                $result[ $index ] = $value;
+            }
+        }
         return $result;
     }
 }

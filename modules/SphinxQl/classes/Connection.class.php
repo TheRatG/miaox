@@ -183,7 +183,7 @@ class Miaox_SphinxQl_Connection
 			}
 
 			$count++;
-		} while ( $this->_driver->next_result() );
+		} while ( $this->_driver->more_results() && $this->_driver->next_result() );
 
 		return $result;
 	}

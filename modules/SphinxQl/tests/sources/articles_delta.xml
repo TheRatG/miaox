@@ -5,7 +5,7 @@
         <sphinx:field name="title" />
         <sphinx:field name="body" />
         <sphinx:field name="tags" />
-        <sphinx:field name="is_valid" type="bool" />
+        <sphinx:attr name="is_valid" type="bool" />
         <sphinx:attr
                 name="publish_date"
                 type="timestamp" />

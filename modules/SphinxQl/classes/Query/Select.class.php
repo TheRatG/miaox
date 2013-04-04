@@ -6,6 +6,71 @@
  */
 class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
 {
+    /**
+     *  any of 'proximity_bm25', 'bm25', 'none', 'wordcount', 'proximity', 'matchany', or 'fieldmask'
+     */
+    const OPTION_RANKER = 'ranker';
+
+    /**
+     * 'max_matches' - integer (per-query max matches value)
+     */
+    const OPTION_MAX_MATCHES = 'max_matches';
+
+    /**
+     * 'cutoff' - integer (max found matches threshold)
+     */
+    const OPTION_CUTOFF = 'cutoff';
+
+    /**
+     * 'max_query_time' - integer (max search time threshold, msec)
+     */
+    const OPTION_MAX_QUERY_TIME = 'max_query_time';
+
+    /**
+     * 'retry_count' - integer (distributed retries count)
+     */
+    const OPTION_RETRY_COUNT = 'retry_count';
+
+    /**
+     * 'retry_delay' - integer (distributed retry delay, msec)
+     */
+    const OPTION_RETRY_DELAY = 'retry_delay';
+
+    /**
+     * 'field_weights' - a named integer list (per-field user weights for ranking)
+     */
+    const OPTION_FIELD_WEIGHTS = 'field_weights';
+
+    /**
+     * 'index_weights' - a named integer list (per-index user weights for ranking)
+     */
+    const OPTION_INDEX_WEIGHTS = 'index_weights';
+
+    /**
+     * 'reverse_scan' - 0 or 1, lets you control the order in which full-scan query processes the rows
+     */
+    const OPTION_REVERSE_SCAN = 'reverse_scan';
+
+    /**
+     * 'comment' - string, user comment that gets copied to a query log file
+     */
+    const OPTION_COMMENT = 'comment';
+
+    protected $_options = array();
+
+    protected $_optionsMap = array(
+        self::OPTION_RANKER,
+        self::OPTION_MAX_MATCHES,
+        self::OPTION_CUTOFF,
+        self::OPTION_MAX_QUERY_TIME,
+        self::OPTION_RETRY_COUNT,
+        self::OPTION_RETRY_DELAY,
+        self::OPTION_FIELD_WEIGHTS,
+        self::OPTION_INDEX_WEIGHTS,
+        self::OPTION_REVERSE_SCAN,
+        self::OPTION_COMMENT
+    );
+
     private $_attributes = array();
 
     private $_indexes = array();
@@ -15,6 +80,10 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
     private $_match = array( array(), array() );
 
     private $_orderBy = array();
+
+    private $_offset = 0;
+
+    private $_rowCount = null;
 
     public function setAttributes( array $attributes = array() )
     {
@@ -37,7 +106,15 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
             'enclosingQuotes' => $enclosingQuotes
         );
 
-        //@TODO: check value if condition not multiply throw exception (for example IN is multi)
+        if ( in_array(
+            $operator, array( Miaox_SphinxQl::IN, Miaox_SphinxQl::NOT_IN, Miaox_SphinxQl::BETWEEN )
+        )
+            && !is_array( $value )
+        )
+        {
+            $msg = sprintf( 'Invalid param $value, must be array, because $operator is "IN"', $operator );
+            throw new Miaox_SphinxQl_Query_Exception( $msg );
+        }
         $this->_where[ ] = $item;
     }
 
@@ -68,6 +145,28 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
         $this->_orderBy[ ] = $item;
     }
 
+    public function setRowCount( $rowCount )
+    {
+        assert( is_numeric( $rowCount ) );
+        $this->_rowCount = $rowCount;
+    }
+
+    public function setOffset( $offset )
+    {
+        assert( is_numeric( $offset ) );
+        $this->_offset = $offset;
+    }
+
+    public function setOption( $option, $value )
+    {
+        if ( !in_array( $option, $this->_optionsMap ) )
+        {
+            $msg = sprintf( 'Invalid option name (%s)', $option );
+            throw new Miaox_SphinxQl_Query_Exception( $msg );
+        }
+        $this->_options[ $option ] = $value;
+    }
+
     public function compile()
     {
         $queryString = array();
@@ -75,6 +174,8 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
         $queryString[ ] = $this->_buildFrom();
         $queryString[ ] = $this->_buildWhere();
         $queryString[ ] = $this->_buildOrderBy();
+        $queryString[ ] = $this->_buildLimit();
+        $queryString[ ] = $this->_buildOption();
         $queryString = array_filter( $queryString );
         $this->setQueryString( implode( ' ', $queryString ) );
         return parent::compile();
@@ -149,6 +250,11 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
 
             if ( !empty( $this->_where ) )
             {
+                if ( !$this->_isMatchEmpty() )
+                {
+                    $result[ ] = 'AND';
+                }
+
                 $result[ ] = $this->_processWhere();
             }
         }
@@ -172,6 +278,45 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
             }
             $result = implode( ', ', $result );
             $result = 'ORDER BY ' . $result;
+        }
+        return $result;
+    }
+
+    protected function _buildLimit()
+    {
+        $offset = $this->_offset;
+        $limit = $this->_rowCount;
+
+        $result = '';
+        if ( 0 !== $offset || !is_null( $limit ) )
+        {
+            $result = array();
+            $result[ ] = 'LIMIT';
+
+            if ( ( $offset && $limit ) || $offset )
+            {
+                $result[ ] = sprintf( "%s, %s", $offset, $limit );
+            }
+            else if ( $limit )
+            {
+                $result[ ] = $limit;
+            }
+            $result = implode( ' ', $result );
+        }
+        return $result;
+    }
+
+    protected function _buildOption()
+    {
+        $result = '';
+        if ( !empty( $this->_options ) )
+        {
+            $result = array();
+            foreach ( $this->_options as $option => $value )
+            {
+                $result[ ] = sprintf( '%s=%s', $option, $value );
+            }
+            $result = 'OPTION ' . implode( ', ', $result );
         }
         return $result;
     }

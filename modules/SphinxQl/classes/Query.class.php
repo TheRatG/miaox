@@ -38,11 +38,6 @@ class Miaox_SphinxQl_Query
 
     public function compile()
     {
-        return $this->_backLink;
-    }
-
-    public function getCompiled()
-    {
         return $this->_queryString;
     }
 
