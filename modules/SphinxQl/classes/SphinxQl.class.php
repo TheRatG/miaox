@@ -210,6 +210,47 @@ class Miaox_SphinxQl
     }
 
     /**
+     * @example $opts
+     * <code>
+     * $opts = array(
+     *    "before_match" => '<span class="find-text">',
+     *    "after_match" => "</span>",
+     *    "chunk_separator" => " ... ",
+     *    "limit" => 200,
+     *    "around" => 10 );
+     * </code>
+     * @param $docs
+     * @param $index
+     * @param string $query
+     * @param array $opts
+     * @return array
+     */
+    public function callSnippets( $docs, $index, $query, $opts = array() )
+    {
+        $query = new Miaox_SphinxQl_Query_Snippet( $docs, $index, $query, $opts );
+        $queryString = $query->compile();
+        $queryResult = $this->_connection->query( $queryString );
+        $result = array();
+
+        if ( !empty( $queryResult ) )
+        {
+            $i = 0;
+            if ( is_array( $docs ) )
+            {
+                foreach ( array_keys( $docs ) as $key )
+                {
+                    $result[ $key ] = stripcslashes( current( $queryResult[ $i++ ] ) );
+                }
+            }
+            else
+            {
+                $result = stripcslashes( current( $queryResult[ $i ] ) );
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Processing result from info query, for example "SHOW META"
      * @param array $list
      * @return array
