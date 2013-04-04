@@ -38,4 +38,21 @@ class Miaox_SphinxQl_Test extends Miaox_SphinxQl_Helper_Test
         );
         $this->assertEquals( $expected, $meta );
     }
+
+    public function testCount()
+    {
+        $search = $this->_sphinxQl;
+        $search
+            ->select( '1 as dummy', 'count(*) as total' )
+            ->from( 'articles', 'articles_delta' )
+            ->groupBy( 'dummy' );
+        $actual = $search->execute();
+        $expected = array(
+            0 => array(
+                'dummy' => '1',
+                'total' => '8',
+            ),
+        );
+        $this->assertEquals( $expected, $actual );
+    }
 }

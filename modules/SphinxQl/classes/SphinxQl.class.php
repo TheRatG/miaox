@@ -132,6 +132,12 @@ class Miaox_SphinxQl
         return $this;
     }
 
+    public function groupBy( $column )
+    {
+        $this->_query->addGroupBy( $column );
+        return $this;
+    }
+
     public function orderBy( $column, $direction = Miaox_SphinxQl::ORDER_ASC )
     {
         $this->_query->addOrderBy( $column, $direction );

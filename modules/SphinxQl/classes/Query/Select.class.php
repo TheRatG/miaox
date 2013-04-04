@@ -79,6 +79,8 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
 
     private $_match = array( array(), array() );
 
+    private $_groupBy = array();
+
     private $_orderBy = array();
 
     private $_offset = 0;
@@ -139,6 +141,11 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
         }
     }
 
+    public function addGroupBy( $column )
+    {
+        $this->_groupBy[ ] = $column;
+    }
+
     public function addOrderBy( $column, $direction )
     {
         $item = array( 'column' => $column, 'direction' => $direction );
@@ -173,6 +180,7 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
         $queryString[ ] = $this->_buildSelect();
         $queryString[ ] = $this->_buildFrom();
         $queryString[ ] = $this->_buildWhere();
+        $queryString[ ] = $this->_buildGroupBy();
         $queryString[ ] = $this->_buildOrderBy();
         $queryString[ ] = $this->_buildLimit();
         $queryString[ ] = $this->_buildOption();
@@ -257,6 +265,18 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
 
                 $result[ ] = $this->_processWhere();
             }
+        }
+        $result = implode( ' ', $result );
+        return $result;
+    }
+
+    protected function _buildGroupBy()
+    {
+        $result = array();
+        if ( !empty( $this->_groupBy ) )
+        {
+            $result[ ] = 'GROUP BY';
+            $result[ ] = implode( ', ', $this->_groupBy );
         }
         $result = implode( ' ', $result );
         return $result;
