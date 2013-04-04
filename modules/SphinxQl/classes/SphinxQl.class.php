@@ -53,9 +53,9 @@ class Miaox_SphinxQl
 
     protected $_globalOptions = array();
 
-    public function __construct( $host, $port )
+    public function __construct( $host, $port, $noMultiQuery = false )
     {
-        $this->_connection = new Miaox_SphinxQl_Connection( $host, $port );
+        $this->_connection = new Miaox_SphinxQl_Connection( $host, $port, $noMultiQuery );
     }
 
     /**

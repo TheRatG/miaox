@@ -9,36 +9,39 @@ require_once 'Connection/Exception.class.php';
 
 class Miaox_SphinxQl_Connection
 {
-	/**
-	 * MySQLi
-	 * @var MySQLi
-	 */
-	protected $_driver;
+    /**
+     * MySQLi
+     * @var MySQLi
+     */
+    protected $_driver;
 
-	/**
-	 *
-	 * @var string Host
-	 */
-	protected $_host;
-	/**
-	 *
-	 * @var string Port
-	 */
-	protected $_port;
-	protected $_multiQuery;
+    /**
+     * @var string Host
+     */
+    protected $_host;
 
-	public function __construct( $host, $port )
-	{
-		$this->_host = $host;
-		$this->_port = $port;
+    /**
+     * @var string Port
+     */
+    protected $_port;
 
-		$this->_multiQuery = true;
-	}
+    protected $_multiQuery;
 
-	public function __destruct()
-	{
-		unset( $this->_driver );
-	}
+    protected $_noMultiQuery;
+
+    public function __construct( $host, $port, $noMultiQuery = false )
+    {
+        $this->_host = $host;
+        $this->_port = $port;
+        $this->_noMultiQuery = $noMultiQuery;
+
+        $this->_multiQuery = true;
+    }
+
+    public function __destruct()
+    {
+        unset( $this->_driver );
+    }
 
     /**
      * Establishes connection to SphinxQL with MySQLi
@@ -46,181 +49,179 @@ class Miaox_SphinxQl_Connection
      * @throws Miaox_SphinxQl_Connection_Exception
      */
     public function connect()
-	{
-		$exceptionizer = new Miaox_Exceptionizer( E_ALL );
-		try
-		{
-			$conn = new MySQLi( $this->_host, null, null, null, $this->_port, null );
-		}
-		catch ( Miaox_Exceptionizer_Exception $e )
-		{
-			throw new Miaox_SphinxQl_Connection_Exception( $e->getMessage() );
-		}
-		unset( $exceptionizer );
+    {
+        $exceptionizer = new Miaox_Exceptionizer( E_ALL );
+        try
+        {
+            $conn = new MySQLi( $this->_host, null, null, null, $this->_port, null );
+        }
+        catch ( Miaox_Exceptionizer_Exception $e )
+        {
+            throw new Miaox_SphinxQl_Connection_Exception( $e->getMessage() );
+        }
+        unset( $exceptionizer );
 
-		if ( $conn->connect_error )
-		{
-			throw new Miaox_SphinxQl_Connection_Exception( 'Connection error: [' . $conn->connect_errno . ']' . $conn->connect_error );
-		}
-		$this->_driver = $conn;
-		return true;
-	}
+        if ( $conn->connect_error )
+        {
+            throw new Miaox_SphinxQl_Connection_Exception( 'Connection error: [' . $conn->connect_errno . ']' . $conn->connect_error );
+        }
+        $this->_driver = $conn;
+        return true;
+    }
 
-	/**
-	 * Closes the connection to SphinxQL
-	 */
-	public function close()
-	{
-		$result = $this->_driver->close();
-		return $result;
-	}
+    /**
+     * Closes the connection to SphinxQL
+     */
+    public function close()
+    {
+        $result = $this->_driver->close();
+        return $result;
+    }
 
-	/**
-	 * Ping the SphinxQL server
-	 *
-	 * @return  boolean  True if connected, false otherwise
-	 */
-	public function ping()
-	{
-		$result = $this->_driver->ping();
-		return $result;
-	}
+    /**
+     * Ping the SphinxQL server
+     * @return  boolean  True if connected, false otherwise
+     */
+    public function ping()
+    {
+        $result = $this->_driver->ping();
+        return $result;
+    }
 
-	public function isConnected()
-	{
-		$result = !is_null( $this->_driver );
-		return $result;
-	}
+    public function isConnected()
+    {
+        $result = !is_null( $this->_driver );
+        return $result;
+    }
 
-	/**
-	 * Sends the query to Sphinx
-	 *
-	 * @param  string  $query  The query string
-	 * @return  array  The result array
-	 * @throws  Miaox_SphinxQl_Connection_Exception  If the executed query produced an error
-	 */
-	public function query( $query )
-	{
-		if ( !$this->isConnected() )
-		{
-			$this->connect();
-		}
-		else
-		{
-			$this->ping();
-		}
+    /**
+     * Sends the query to Sphinx
+     * @param  string $query  The query string
+     * @return  array  The result array
+     * @throws  Miaox_SphinxQl_Connection_Exception  If the executed query produced an error
+     */
+    public function query( $query )
+    {
+        if ( !$this->isConnected() )
+        {
+            $this->connect();
+        }
+        else
+        {
+            $this->ping();
+        }
 
-		$resource = $this->_driver->query( $query );
+        $resource = $this->_driver->query( $query );
 
-		if ( $this->_driver->error )
-		{
-			throw new Miaox_SphinxQl_Connection_Exception( '[' . $this->_driver->errno . '] ' . $this->_driver->error . ' [ ' . $query . ']' );
-		}
+        if ( $this->_driver->error )
+        {
+            throw new Miaox_SphinxQl_Connection_Exception( '[' . $this->_driver->errno . '] ' . $this->_driver->error . ' [ ' . $query . ']' );
+        }
 
-		if ( $resource instanceof mysqli_result )
-		{
-			$rows = array();
-			while ( !is_null( $row = $resource->fetch_assoc() ) )
-			{
-				$rows[] = $row;
-			}
-			$resource->free_result();
-			$result = $rows;
-		}
-		else
-		{
-			// sphinxql doesn't return insert_id because we always have to point it out ourselves!
-			$result = array(
-				$this->_driver->affected_rows );
-		}
-		return $result;
-	}
+        if ( $resource instanceof mysqli_result )
+        {
+            $rows = array();
+            while ( !is_null( $row = $resource->fetch_assoc() ) )
+            {
+                $rows[ ] = $row;
+            }
+            $resource->free_result();
+            $result = $rows;
+        }
+        else
+        {
+            // sphinxql doesn't return insert_id because we always have to point it out ourselves!
+            $result = array(
+                $this->_driver->affected_rows
+            );
+        }
+        return $result;
+    }
 
-	public function multiQuery( $query )
-	{
-		if ( $this->_multiQuery )
-		{
-			$result = $this->_multiQuery( $query );
-		}
-		else
-		{
-			$result = $this->_emulateMultiQuery( $query );
-		}
-		return $result;
-	}
+    public function multiQuery( $query )
+    {
+        if ( !$this->_noMultiQuery )
+        {
+            $result = $this->_multiQuery( $query );
+        }
+        else
+        {
+            $result = $this->_emulateMultiQuery( $query );
+        }
+        return $result;
+    }
 
-	protected function _multiQuery( $query )
-	{
-		if ( !$this->isConnected() )
-		{
-			$this->connect();
-		}
-		else
-		{
-			$this->ping();
-		}
+    /**
+     * Escapes the input with real_escape_string
+     * Taken from FuelPHP and edited
+     * @param  string $value  The string to escape
+     * @return  string  The escaped string
+     * @throws  Miaox_SphinxQl_Connection_Exception  If there was an error during the escaping
+     */
+    public function escape( $value )
+    {
+        if ( !$this->isConnected() )
+        {
+            $this->connect();
+        }
 
-		$this->_driver->multi_query( $query );
-		if ( $this->_driver->error )
-		{
-			throw new Miaox_SphinxQl_Connection_Exception( '[' . $this->_driver->errno . '] ' . $this->_driver->error . ' [ ' . $query . ']' );
-		}
+        if ( ( $value = $this->_driver->real_escape_string( ( string )$value ) ) === false )
+        {
+            throw new Miaox_SphinxQl_Connection_Exception( $this->_driver->error, $this->_driver->errno );
+        }
 
-		$result = array();
-		$count = 0;
-		do
-		{
-			if ( false !== ( $resource = $this->_driver->store_result() ) )
-			{
-				$result[ $count ] = array();
+        return "'" . $value . "'";
+    }
 
-				while ( !is_null( $row = $resource->fetch_assoc() ) )
-				{
-					$result[ $count ][] = $row;
-				}
+    protected function _multiQuery( $query )
+    {
+        if ( !$this->isConnected() )
+        {
+            $this->connect();
+        }
+        else
+        {
+            $this->ping();
+        }
 
-				$resource->free_result();
-			}
+        $this->_driver->multi_query( $query );
+        if ( $this->_driver->error )
+        {
+            throw new Miaox_SphinxQl_Connection_Exception( '[' . $this->_driver->errno . '] ' . $this->_driver->error . ' [ ' . $query . ']' );
+        }
 
-			$count++;
-		} while ( $this->_driver->more_results() && $this->_driver->next_result() );
+        $result = array();
+        $count = 0;
+        do
+        {
+            if ( false !== ( $resource = $this->_driver->store_result() ) )
+            {
+                $result[ $count ] = array();
 
-		return $result;
-	}
+                while ( !is_null( $row = $resource->fetch_assoc() ) )
+                {
+                    $result[ $count ][ ] = $row;
+                }
 
-	protected function _emulateMultiQuery( $query )
-	{
-		$result = array();
-		$list = explode( ';', $query );
-		$list = array_filter( $list );
-		for( $i = 0, $cnt = count( $list ); $i < $cnt; $i++ )
-		{
-			$result[ $i ] = $this->query( $list[ $i ] );
-		}
-		return $result;
-	}
+                $resource->free_result();
+            }
 
-	/**
-	 * Escapes the input with real_escape_string
-	 * Taken from FuelPHP and edited
-	 *
-	 * @param  string  $value  The string to escape
-	 *
-	 * @return  string  The escaped string
-	 * @throws  Miaox_SphinxQl_Connection_Exception  If there was an error during the escaping
-	 */
-	public function escape( $value )
-	{
-		if ( !$this->isConnected() )
-		{
-			$this->connect();
-		}
+            $count++;
+        }
+        while ( $this->_driver->more_results() && $this->_driver->next_result() );
 
-		if ( ( $value = $this->_driver->real_escape_string( ( string ) $value ) ) === false )
-		{
-			throw new Miaox_SphinxQl_Connection_Exception( $this->_driver->error, $this->_driver->errno );
-		}
+        return $result;
+    }
 
-		return "'" . $value . "'";
-	}
+    protected function _emulateMultiQuery( $query )
+    {
+        $result = array();
+        $list = explode( ';', $query );
+        $list = array_filter( $list );
+        for ( $i = 0, $cnt = count( $list ); $i < $cnt; $i++ )
+        {
+            $result[ $i ] = $this->query( $list[ $i ] );
+        }
+        return $result;
+    }
 }

@@ -17,11 +17,6 @@ require_once 'SphinxQl.class.Test.php';
 
 class Miaox_SphinxQl_Suite extends PHPUnit_Framework_TestSuite
 {
-    protected function setUp()
-    {
-        print "\nMySuite::setUp()";
-    }
-
     public static function suite()
     {
         $suite = new PHPUnit_Framework_TestSuite( 'PHPUnit SphinxQl' );
@@ -34,7 +29,7 @@ class Miaox_SphinxQl_Suite extends PHPUnit_Framework_TestSuite
         $suite->addTestSuite( 'Miaox_SphinxQl_Order_Test' );
         $suite->addTestSuite( 'Miaox_SphinxQl_Limit_Test' );
         $suite->addTestSuite( 'Miaox_SphinxQl_Option_Test' );
-//        $suite->addTestSuite( 'Miaox_SphinxQl_Queue_Test' );
+        $suite->addTestSuite( 'Miaox_SphinxQl_Queue_Test' );
         $suite->addTestSuite( 'Miaox_SphinxQl_Test' );
         return $suite;
     }
