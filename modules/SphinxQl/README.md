@@ -64,7 +64,6 @@ if ( $resultBatch && isset( $resultBatch[ 0 ], $resultBatch[ 1 ] ) )
 * executeBatch( array $query )
 
 * callSnippets( array $docs, string $index, string $query, array $opts = array() )
-* callSnippets( $text, $index, $hits )
 * describe()
 
 # Query Builder
