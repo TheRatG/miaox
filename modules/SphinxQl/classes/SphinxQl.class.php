@@ -3,337 +3,362 @@
  * @author vpak
  * @date 2013-01-22 09:45:15
  */
-class Miaox_SphinxQl extends Miaox_SphinxQl_Query
+require_once 'Exception.class.php';
+require_once 'Connection.class.php';
+require_once 'Query.class.php';
+require_once 'Log.class.php';
+
+class Miaox_SphinxQl
 {
-	const ORDER_ASC = 'asc';
-	const ORDER_DESC = 'desc';
+    const BETWEEN = 'BETWEEN';
 
-	/**
-	 * Ready for use queries
-	 *
-	 * @var  array
-	 */
-	protected static $_showQueries = array(
-		'meta' => 'SHOW META',
-		'warnings' => 'SHOW WARNINGS',
-		'status' => 'SHOW STATUS',
-		'tables' => 'SHOW TABLES',
-		'variables' => 'SHOW VARIABLES',
-		'variablesSession' => 'SHOW SESSION VARIABLES',
-		'variablesGlobal' => 'SHOW GLOBAL VARIABLES' );
+    const IN = 'IN';
 
-	/**
-	 *
-	 * @var Miao_Log
-	 */
-	protected $_log;
+    const NOT_IN = 'NOT IN';
 
-	/**
-	 *
-	 * @var Miaox_SphinxQl_Connection
-	 */
-	protected $_connection;
+    /**
+     * Order direction asc (1, 2, 3, 4...)
+     */
+    const ORDER_ASC = 'ASC';
 
-	/**
-	 *
-	 * @var array
-	 */
-	protected $_queue = array();
+    /**
+     * Order direction desc (10, 9, 8, 7...)
+     */
+    const ORDER_DESC = 'DESC';
 
-	public function getLog()
-	{
-		if ( is_null( $this->_log ) )
-		{
-			$this->_log = Miao_Log::easyFactory();
-		}
-		return $this->_log;
-	}
+    const SHOW_META = 'SHOW META';
 
-	public function __construct( $host, $port, Miao_Log $log = null )
-	{
-		$this->_log = $log;
-		$msg = sprintf( 'Try to connect: host - %s, port - %s', $host, $port );
-		$this->getLog()->debug( $msg );
+    const SHOW_WARNINGS = 'SHOW WARNINGS';
 
-		$this->_connection = new Miaox_SphinxQl_Connection( $host, $port );
-		$this->getLog()->debug( 'Connected' );
-	}
+    const SHOW_STATUS = 'SHOW STATUS';
 
-	public function __destruct()
-	{
-		unset( $this->_connection );
-	}
+    const SHOW_TABLES = 'SHOW TABLES';
 
-	public function __call( $method, $args )
-	{
-		$result = array();
-		if ( array_key_exists( $method, self::$_showQueries ) )
-		{
-			$str = self::$_showQueries[ $method ];
-			$list = $this->_query( $str );
+    const SHOW_VARIABLES = 'SHOW VARIABLES';
 
-			if ( is_array( $list ) )
-			{
-				$result = $this->processingResult( $list );
-			}
-		}
-		else
-		{
-			$msg = sprintf( 'Method %s does not exists', $method );
-			throw new Miaox_SphinxQl_Exception( $msg );
-		}
-		return $result;
-	}
+    const SHOW_SESSION_VARIABLES = 'SHOW SESSION VARIABLES';
 
-	/**
-	 * Execute last select query
-	 * @return Ambigous <multitype:, multitype:NULL , multitype:multitype: >
-	 */
-	public function execute()
-	{
-		$str = $this->compile()->getCompiled();
-		$result = $this->_query( $str );
-		return $result;
-	}
+    const SHOW_GLOBAL_VARIABLES = 'SHOW GLOBAL VARIABLES';
 
-	/**
-	 * Added query to queue
-	 * @param unknown_type $query
-	 * @return Miaox_SphinxQl
-	 */
-	public function enqueue( $query = '' )
-	{
-		if ( empty( $query ) )
-		{
-			$query = $this->compile()->getCompiled();
-		}
-		$this->_queue[] = $query;
-		return $this;
-	}
+    /**
+     * @var Miaox_SphinxQl_Connection
+     */
+    protected $_connection;
 
-	/**
-	 * Execute multi query
-	 * @throws Miaox_SphinxQl_Connection_Exception
-	 * @return Ambigous <multitype:, multitype:multitype: >
-	 */
-	public function executeBatch( $clearQueue = true )
-	{
-		$queue = $this->_queue;
-		if ( count( $queue ) === 0 )
-		{
-			throw new Miaox_SphinxQl_Connection_Exception( 'The Queue is empty.' );
-		}
-		$result = $this->_multiQuery( $queue );
-		if ( $result && $clearQueue )
-		{
-			$this->_queue = array();
-		}
-		return $result;
-	}
+    /**
+     * @var Miaox_SphinxQl_Query
+     */
+    protected $_query;
 
-	/**
-	 * Proccessing result from info query, for example "SHOW META"
-	 * @param array $list
-	 * @return multitype:mixed
-	 */
-	public function processingResult( array $list )
-	{
-		$result = array();
-		if ( is_array( $list ) && !empty( $list ) )
-		{
-			foreach ( $list as $item )
-			{
-				$index = current( $item );
-				$value = next( $item );
-				$result[ $index ] = $value;
-			}
-		}
-		return $result;
-	}
+    protected $_queue = array();
 
-	/**
-	 * CALL SNIPPETS syntax
-	 *
-	 * @example $opts
-	 * <code>
-	 * $opts = array(
-	 *	"before_match" => '<span class="find-text">',
-	 *	"after_match" => "</span>",
-	 *	"chunk_separator" => " ... ",
-	 *	"limit" => 200,
-	 *	"around" => 10 );
-	 * </code>
-	 *
-	 * @param string $data
-	 * @param string $index
-	 * @param array $extra
-	 *
-	 * @return array The result of the query
-	 */
-	public function callSnippets( $docs, $index, $query, $opts = array() )
-	{
-		$buildQuery = $this->_compileCallSnippets( $docs, $index, $query, $opts );
-		$queryResult = $this->_query( $buildQuery );
-		$result = array();
+    protected $_globalOptions = array();
 
-		if ( !empty( $queryResult ) )
-		{
-			$i = 0;
-			if ( is_array( $docs ) )
-			{
-				foreach ( array_keys( $docs ) as $key )
-				{
-					$result[ $key ] = stripcslashes( current( $queryResult[ $i++ ] ) );
-				}
-			}
-			else
-			{
-				$result = stripcslashes( current( $queryResult[ $i ] ) );
-			}
-		}
-		return $result;
-	}
+    protected $_log;
 
-	/**
-	 * CALL KEYWORDS syntax
-	 *
-	 * @param string $text
-	 * @param string $index
-	 * @param null|string $hits
-	 *
-	 * @return array The result of the query
-	 */
-	public function callKeywords( $text, $index, $hits = null )
-	{
-		$arr = array(
-			$text,
-			$index );
-		if ( $hits !== null )
-		{
-			$arr[] = $hits;
-		}
+    public function __construct( $host, $port, $log = null, $multiQuery = true )
+    {
+        $this->setLog( $log );
+        $msg = sprintf( 'Try to connect: host - %s, port - %s', $host, $port );
+        $this
+            ->getLog()
+            ->debug( $msg );
+        $this->_connection = new Miaox_SphinxQl_Connection( $host, $port, $multiQuery );
 
-		return $this->getConnection()->query( 'CALL KEYWORDS(' . implode( ', ', $this->getConnection()->quoteArr( $arr ) ) . ')' );
-	}
+        $msg = sprintf( 'Connected. MultiQuery: %s', $multiQuery ? 'enabled' : 'disabled' );
+        $this
+            ->getLog()
+            ->debug( $msg );
+    }
 
-	/**
-	 * DESCRIBE syntax
-	 *
-	 * @param string $index The name of the index
-	 *
-	 * @return array The result of the query
-	 */
-	public function describe( $index )
-	{
-		$query = 'DESCRIBE ' . $this->_quoteIdentifier( $index );
-		$result = $this->_query( $query );
-		return $result;
-	}
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     * @throws Miaox_SphinxQl_Exception
+     */
+    public function __call( $name, $arguments )
+    {
+        $result = null;
+        if ( method_exists( $this->_query, $name ) )
+        {
+            $result = call_user_func_array( array( $this->_query, $name ), $arguments );
+        }
+        else
+        {
+            $message = sprintf( 'Method "%s" does not exists', $name );
+            throw new Miaox_SphinxQl_Exception( $message );
+        }
+        return $result;
+    }
 
-	/**
-	 * SET syntax
-	 *
-	 * @param string $name The name of the variable
-	 * @param mixed $value The value o the variable
-	 * @param boolean $global True if the variable should be global, false otherwise
-	 *
-	 * @return array The result of the query
-	 */
-	public function setVariable( $name, $value, $global = false )
-	{
-		$query = 'SET ';
+    public function getLog()
+    {
+        if ( !is_object( $this->_log ) )
+        {
+            $this->_log = new Miaox_SphinxQl_Log();
+        }
+        return $this->_log;
+    }
 
-		if ( $global )
-		{
-			$query .= 'GLOBAL ';
-		}
+    public function setLog( $log )
+    {
+        $this->_log = $log;
+    }
 
-		$user_var = strpos( $name, '@' ) === 0;
+    public function setGlobalOption( $option, $value )
+    {
+        assert( is_scalar( $option ) );
+        assert( is_scalar( $option ) );
+        $this->_globalOptions[ $option ] = $value;
+    }
 
-		// if it has an @ it's a user variable and we can't wrap it
-		if ( $user_var )
-		{
-			$query .= $name . ' ';
-		}
-		else
-		{
-			$query .= $this->_quoteIdentifier( $name ) . ' ';
-		}
+    public function select()
+    {
+        $this->_query = new Miaox_SphinxQl_Query_Select( $this );
+        $attributes = Miaox_SphinxQl_Query::pivotArray( func_get_args() );
+        $this->_query->setAttributes( $attributes );
 
-		// user variables must always be processed as arrays
-		if ( $user_var && !is_array( $value ) )
-		{
-			$query .= '= (' . $this->_quote( $value ) . ')';
-		}
-		elseif ( is_array( $value ) )
-		{
-			$query .= '= (' . implode( ', ', $this->_quoteArr( $value ) ) . ')';
-		}
-		else
-		{
-			$query .= '= ' . $this->_quote( $value );
-		}
+        if ( !empty( $this->_globalOptions ) )
+        {
+            foreach ( $this->_globalOptions as $option => $value )
+            {
+                $this->option( $option, $value );
+            }
+        }
 
-		$this->_query( $query );
-	}
+        return $this;
+    }
 
-	/**
-	 * Escapes the input with real_escape_string
-	 * Taken from FuelPHP and edited
-	 *
-	 * @param  string  $value  The string to escape
-	 *
-	 * @return  string  The escaped string
-	 * @throws  Miaox_SphinxQl_Connection_Exception  If there was an error during the escaping
-	 */
-	protected function _escape( $value )
-	{
-		$result = $this->_connection->escape( $value );
-		return $result;
-	}
+    public function from()
+    {
+        $indexes = Miaox_SphinxQl_Query::pivotArray( func_get_args() );
+        $this->_query->setIndexes( $indexes );
+        return $this;
+    }
 
-	/**
-	 * @param string $query string
-	 * @return array
-	 */
-	protected function _query( $query )
-	{
-		$result = null;
-		try
-		{
-			$this->getLog()->debug( $query );
-			$result = $this->_connection->query( $query );
-			$msg = sprintf( 'Result cnt: %d', count( $result ) );
-			$this->getLog()->debug( $msg );
-		}
-		catch ( Miaox_SphinxQl_Exception $e )
-		{
-			$this->getLog()->err( $e->getMessage() );
-			throw $e;
-		}
-		return $result;
-	}
+    public function match( $column, $value = null, $escape = false )
+    {
+        if ( is_null( $value ) )
+        {
+            $value = $column;
+            $column = '';
+        }
+        $this->_query->addMatchCondition( $column, $value, $escape );
+        return $this;
+    }
 
-	/**
-	 * @param string $query string
-	 * @return array
-	 */
-	protected function _multiQuery( array $queue )
-	{
-		$result = null;
-		try
-		{
-			$query = implode( '; ', $queue ) . ';';
-			$this->getLog()->debug( $query );
-			$result = $this->_connection->multiQuery( $query );
-			$msg = sprintf( 'Result cnt: %d', count( $result ) );
-			$this->getLog()->debug( $msg );
-		}
-		catch ( Miaox_SphinxQl_Exception $e )
-		{
-			$this->getLog()->err( $e->getMessage() );
-			throw $e;
-		}
-		return $result;
-	}
+    public function where( $column, $operator, $value = null, $enclosingQuotes = true )
+    {
+        if ( is_null( $value ) )
+        {
+            $value = $operator;
+            $operator = '=';
+        }
+        $this->_query->addWhereCondition( $column, $operator, $value, $enclosingQuotes );
+        return $this;
+    }
+
+    public function groupBy( $column )
+    {
+        $this->_query->addGroupBy( $column );
+        return $this;
+    }
+
+    public function orderBy( $column, $direction = Miaox_SphinxQl::ORDER_ASC )
+    {
+        $this->_query->addOrderBy( $column, $direction );
+        return $this;
+    }
+
+    public function option( $option, $value )
+    {
+        $this->_query->setOption( $option, $value );
+        return $this;
+    }
+
+    /**
+     * Work like SQL limit: LIMIT [offset,] row_count
+     * @param $offset
+     * @param null $rowCount
+     * @return $this
+     */
+    public function limit( $offset, $rowCount = null )
+    {
+        if ( is_null( $rowCount ) )
+        {
+            $this->_query->setRowCount( $offset );
+        }
+        else
+        {
+            $this->_query->setOffset( $offset );
+            $this->_query->setRowCount( $rowCount );
+        }
+        return $this;
+    }
+
+    public function offset( $offset )
+    {
+        $this->_query->setOffset( $offset );
+        return $this;
+    }
+
+    public function compile()
+    {
+        return $this->_query->compile();
+    }
+
+    public function execute( $query = null, &$meta = null )
+    {
+        if ( empty( $query ) )
+        {
+            $query = $this->compile();
+        }
+        $result = null;
+        if ( !is_null( $meta ) )
+        {
+            $this->enqueue();
+            $this->enqueue( Miaox_SphinxQl::SHOW_META );
+            $resultBatch = $this->executeBatch();
+            if ( $resultBatch && isset( $resultBatch[ 0 ], $resultBatch[ 1 ] ) )
+            {
+                $result = $resultBatch[ 0 ];
+                $meta = $this->processingResult( $resultBatch[ 1 ] );
+            }
+        }
+        else
+        {
+            $result = $this->_query( $query );
+        }
+        return $result;
+    }
+
+    public function enqueue( $query = null )
+    {
+        if ( empty( $query ) )
+        {
+            $query = $this->compile();
+        }
+        $this->_queue[ ] = $query;
+    }
+
+    public function executeBatch( $clearQueue = true )
+    {
+        $query = implode( ';', $this->_queue ) . ';';
+        $result = $this->_multiQuery( $query );
+        if ( $result && $clearQueue )
+        {
+            $this->_queue = array();
+        }
+        return $result;
+    }
+
+    /**
+     * @example $opts
+     * <code>
+     * $opts = array(
+     *    "before_match" => '<span class="find-text">',
+     *    "after_match" => "</span>",
+     *    "chunk_separator" => " ... ",
+     *    "limit" => 200,
+     *    "around" => 10 );
+     * </code>
+     * @param $docs
+     * @param $index
+     * @param string $query
+     * @param array $opts
+     * @return array
+     */
+    public function callSnippets( $docs, $index, $query, $opts = array() )
+    {
+        $query = new Miaox_SphinxQl_Query_Snippet( $docs, $index, $query, $opts );
+        $queryString = $query->compile();
+        $queryResult = $this->_connection->query( $queryString );
+        $result = array();
+
+        if ( !empty( $queryResult ) )
+        {
+            $i = 0;
+            if ( is_array( $docs ) )
+            {
+                foreach ( array_keys( $docs ) as $key )
+                {
+                    $result[ $key ] = stripcslashes( current( $queryResult[ $i++ ] ) );
+                }
+            }
+            else
+            {
+                $result = stripcslashes( current( $queryResult[ $i ] ) );
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Processing result from info query, for example "SHOW META"
+     * @param array $list
+     * @return array
+     */
+    public function processingResult( array $list )
+    {
+        $result = array();
+        if ( is_array( $list ) && !empty( $list ) )
+        {
+            foreach ( $list as $item )
+            {
+                $index = current( $item );
+                $value = next( $item );
+                $result[ $index ] = $value;
+            }
+        }
+        return $result;
+    }
+
+    protected function _query( $query )
+    {
+        $result = null;
+        try
+        {
+            $this
+                ->getLog()
+                ->debug( $query );
+            $result = $this->_connection->query( $query );
+            $msg = sprintf( 'Result cnt: %d', count( $result ) );
+            $this
+                ->getLog()
+                ->debug( $msg );
+        }
+        catch ( Miaox_SphinxQl_Exception $e )
+        {
+            $this
+                ->getLog()
+                ->err( $e->getMessage() );
+            throw $e;
+        }
+        return $result;
+    }
+
+    protected function _multiQuery( $query )
+    {
+        $result = null;
+        try
+        {
+            $this
+                ->getLog()
+                ->debug( $query );
+            $result = $this->_connection->multiQuery( $query );
+            $msg = sprintf( 'Result cnt: %d', count( $result ) );
+            $this
+                ->getLog()
+                ->debug( $msg );
+        }
+        catch ( Miaox_SphinxQl_Exception $e )
+        {
+            $this
+                ->getLog()
+                ->err( $e->getMessage() );
+            throw $e;
+        }
+        return $result;
+    }
 }

@@ -1,4 +1,7 @@
 <?php
+require_once 'Exception.class.php';
+require_once 'Catcher.class.php';
+
 /**
  * Перехватывает ошибки выполнения и генерирует одноименные исключения.
  *
