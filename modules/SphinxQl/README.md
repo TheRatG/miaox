@@ -71,16 +71,19 @@ if ( $resultBatch && isset( $resultBatch[ 0 ], $resultBatch[ 1 ] ) )
 
 http://sphinxsearch.com/docs/2.0.2/sphinxql-select.html
 
+Begin build your query from start() function, and get query result to execute() function.
+If you want get query string, call compile() function.
+
 * select()
 * from()
 * match()
 * where()
 * orderBy()
 * groupBy()
-* withinGroupOrderBy()
 * limit()
 * offset()
 * option()
+* compile()
 
 ### Get total count of documents
 
@@ -118,7 +121,7 @@ array(
 Put five zeros after the integer, example:
 ```
 SELECT *, GEODIST( lat, lng, 0.5894, -1.4724 ) AS geodist FROM ... WHERE geodist >= 0.00000
-``` 
+```
 
 
 ## INSERT
