@@ -6,6 +6,7 @@
 require_once 'Exception.class.php';
 require_once 'Connection.class.php';
 require_once 'Query.class.php';
+require_once 'Log.class.php';
 
 class Miaox_SphinxQl
 {
@@ -53,8 +54,25 @@ class Miaox_SphinxQl
 
     protected $_globalOptions = array();
 
-    public function __construct( $host, $port, $noMultiQuery = false )
+    protected $_log;
+
+    public function setLog( $log )
     {
+        $this->_log = $log;
+    }
+
+    public function getLog()
+    {
+        if ( !is_object( $this->_log ) )
+        {
+            $this->_log = new Miaox_SphinxQl_Log();
+        }
+        return $this->_log;
+    }
+
+    public function __construct( $host, $port, $log = null, $noMultiQuery = false )
+    {
+        $this->setLog( $log );
         $this->_connection = new Miaox_SphinxQl_Connection( $host, $port, $noMultiQuery );
     }
 
@@ -187,6 +205,7 @@ class Miaox_SphinxQl
         {
             $query = $this->compile();
         }
+        $result = null;
         if ( !is_null( $meta ) )
         {
             $this->enqueue();
@@ -200,7 +219,7 @@ class Miaox_SphinxQl
         }
         else
         {
-            $result = $this->_connection->query( $query );
+            $result = $this->_query( $query );
         }
         return $result;
     }
@@ -216,8 +235,8 @@ class Miaox_SphinxQl
 
     public function executeBatch( $clearQueue = true )
     {
-        $query = implode( ';', $this->_queue );
-        $result = $this->_connection->multiQuery( $query );
+        $query = implode( ';', $this->_queue ) . ';';
+        $result = $this->_multiQuery( $query );
         if ( $result && $clearQueue )
         {
             $this->_queue = array();
@@ -282,6 +301,42 @@ class Miaox_SphinxQl
                 $value = next( $item );
                 $result[ $index ] = $value;
             }
+        }
+        return $result;
+    }
+
+    protected function _query( $query )
+    {
+        $result = null;
+        try
+        {
+            $this->getLog()->debug( $query );
+            $result = $this->_connection->query( $query );
+            $msg = sprintf( 'Result cnt: %d', count( $result ) );
+            $this->getLog()->debug( $msg );
+        }
+        catch ( Miaox_SphinxQl_Exception $e )
+        {
+            $this->getLog()->err( $e->getMessage() );
+            throw $e;
+        }
+        return $result;
+    }
+
+    protected function _multiQuery( $query )
+    {
+        $result = null;
+        try
+        {
+            $this->getLog()->debug( $query );
+            $result = $this->_connection->multiQuery( $query );
+            $msg = sprintf( 'Result cnt: %d', count( $result ) );
+            $this->getLog()->debug( $msg );
+        }
+        catch ( Miaox_SphinxQl_Exception $e )
+        {
+            $this->getLog()->err( $e->getMessage() );
+            throw $e;
         }
         return $result;
     }
