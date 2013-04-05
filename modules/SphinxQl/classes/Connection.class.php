@@ -27,15 +27,12 @@ class Miaox_SphinxQl_Connection
 
     protected $_multiQuery;
 
-    protected $_noMultiQuery;
-
-    public function __construct( $host, $port, $noMultiQuery = false )
+    public function __construct( $host, $port, $multiQuery = true )
     {
         $this->_host = $host;
         $this->_port = $port;
-        $this->_noMultiQuery = $noMultiQuery;
 
-        $this->_multiQuery = true;
+        $this->_multiQuery = $multiQuery;
     }
 
     public function __destruct()
@@ -140,7 +137,7 @@ class Miaox_SphinxQl_Connection
 
     public function multiQuery( $query )
     {
-        if ( !$this->_noMultiQuery )
+        if ( $this->_multiQuery )
         {
             $result = $this->_multiQuery( $query );
         }

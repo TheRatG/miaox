@@ -70,10 +70,10 @@ class Miaox_SphinxQl
         return $this->_log;
     }
 
-    public function __construct( $host, $port, $log = null, $noMultiQuery = false )
+    public function __construct( $host, $port, $log = null, $multiQuery = true )
     {
         $this->setLog( $log );
-        $this->_connection = new Miaox_SphinxQl_Connection( $host, $port, $noMultiQuery );
+        $this->_connection = new Miaox_SphinxQl_Connection( $host, $port, $multiQuery );
     }
 
     /**
