@@ -113,6 +113,14 @@ array(
 */
 ```
 
+### Problem with GEODIST function 'unsupported filter type 'intrange' on float column'
+
+Put five zeros after the integer, example:
+```
+SELECT *, GEODIST( lat, lng, 0.5894, -1.4724 ) AS geodist FROM ... WHERE geodist >= 0.00000
+``` 
+
+
 ## INSERT
 
 ## REPLACE
