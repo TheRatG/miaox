@@ -56,24 +56,19 @@ class Miaox_SphinxQl
 
     protected $_log;
 
-    public function setLog( $log )
-    {
-        $this->_log = $log;
-    }
-
-    public function getLog()
-    {
-        if ( !is_object( $this->_log ) )
-        {
-            $this->_log = new Miaox_SphinxQl_Log();
-        }
-        return $this->_log;
-    }
-
     public function __construct( $host, $port, $log = null, $multiQuery = true )
     {
         $this->setLog( $log );
+        $msg = sprintf( 'Try to connect: host - %s, port - %s', $host, $port );
+        $this
+            ->getLog()
+            ->debug( $msg );
         $this->_connection = new Miaox_SphinxQl_Connection( $host, $port, $multiQuery );
+
+        $msg = sprintf( 'Connected. MultiQuery: %s', $multiQuery ? 'enabled' : 'disabled' );
+        $this
+            ->getLog()
+            ->debug();
     }
 
     /**
@@ -95,6 +90,20 @@ class Miaox_SphinxQl
             throw new Miaox_SphinxQl_Exception( $message );
         }
         return $result;
+    }
+
+    public function getLog()
+    {
+        if ( !is_object( $this->_log ) )
+        {
+            $this->_log = new Miaox_SphinxQl_Log();
+        }
+        return $this->_log;
+    }
+
+    public function setLog( $log )
+    {
+        $this->_log = $log;
     }
 
     public function setGlobalOption( $option, $value )
@@ -310,14 +319,20 @@ class Miaox_SphinxQl
         $result = null;
         try
         {
-            $this->getLog()->debug( $query );
+            $this
+                ->getLog()
+                ->debug( $query );
             $result = $this->_connection->query( $query );
             $msg = sprintf( 'Result cnt: %d', count( $result ) );
-            $this->getLog()->debug( $msg );
+            $this
+                ->getLog()
+                ->debug( $msg );
         }
         catch ( Miaox_SphinxQl_Exception $e )
         {
-            $this->getLog()->err( $e->getMessage() );
+            $this
+                ->getLog()
+                ->err( $e->getMessage() );
             throw $e;
         }
         return $result;
@@ -328,14 +343,20 @@ class Miaox_SphinxQl
         $result = null;
         try
         {
-            $this->getLog()->debug( $query );
+            $this
+                ->getLog()
+                ->debug( $query );
             $result = $this->_connection->multiQuery( $query );
             $msg = sprintf( 'Result cnt: %d', count( $result ) );
-            $this->getLog()->debug( $msg );
+            $this
+                ->getLog()
+                ->debug( $msg );
         }
         catch ( Miaox_SphinxQl_Exception $e )
         {
-            $this->getLog()->err( $e->getMessage() );
+            $this
+                ->getLog()
+                ->err( $e->getMessage() );
             throw $e;
         }
         return $result;
