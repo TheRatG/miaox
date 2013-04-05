@@ -83,7 +83,7 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
 
     private $_orderBy = array();
 
-    private $_offset = 0;
+    private $_offset = null;
 
     private $_rowCount = null;
 
@@ -306,15 +306,17 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
     {
         $offset = $this->_offset;
         $limit = $this->_rowCount;
-
         $result = '';
-        if ( 0 !== $offset || !is_null( $limit ) )
+        if ( !is_null( $offset ) || !is_null( $limit ) )
         {
             $result = array();
             $result[ ] = 'LIMIT';
-
-            if ( ( $offset && $limit ) || $offset )
+            if ( ( !is_null( $offset ) && !is_null( $limit ) ) || !is_null( $offset ) )
             {
+                if ( is_null( $limit ) )
+                {
+                    $limit = isset( $this->_options[ self::OPTION_MAX_MATCHES ] ) ? $this->_options[ self::OPTION_MAX_MATCHES ] : PHP_INT_MAX;
+                }
                 $result[ ] = sprintf( "%s, %s", $offset, $limit );
             }
             else if ( $limit )

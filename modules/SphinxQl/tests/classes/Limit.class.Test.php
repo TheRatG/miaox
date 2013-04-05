@@ -23,7 +23,6 @@ class Miaox_SphinxQl_Limit_Test extends Miaox_SphinxQl_Helper_Test
 
     public function testLimitTwo()
     {
-
         $search = $this->_sphinxQl;
         $search
             ->select( 'id' )
@@ -33,6 +32,53 @@ class Miaox_SphinxQl_Limit_Test extends Miaox_SphinxQl_Helper_Test
 
         $expected = array( array( 'id' => 2 ) );
         $actual = $search->execute();
+        $this->assertEquals( $expected, $actual );
+    }
+
+    public function testLimitThree()
+    {
+        $search = $this->_sphinxQl;
+        $search
+            ->select()
+            ->from( 'articles' )
+            ->offset( 5 );
+        $actual = $search->compile();
+        $expected = 'SELECT * FROM `articles` LIMIT 5, ' . PHP_INT_MAX;
+        $this->assertEquals( $expected, $actual );
+
+        $search
+            ->select()
+            ->from( 'articles' )
+            ->limit( 5 )
+            ->offset( 5 );
+        $actual = $search->compile();
+        $expected = 'SELECT * FROM `articles` LIMIT 5, 5';
+        $this->assertEquals( $expected, $actual );
+    }
+
+    public function testLimitFive()
+    {
+        $search = $this->_sphinxQl;
+        $search
+            ->select()
+            ->from( 'articles' )
+            ->limit( 0, 5 );
+        $actual = $search->compile();
+        $expected = 'SELECT * FROM `articles` LIMIT 0, 5';
+        $this->assertEquals( $expected, $actual );
+    }
+
+    public function testLimitWithMaxMatches()
+    {
+        $maxMatches = 1000;
+        $search = $this->_sphinxQl;
+        $search
+            ->select()
+            ->from( 'articles' )
+            ->offset( 5 )
+            ->option( Miaox_SphinxQl_Query_Select::OPTION_MAX_MATCHES, $maxMatches );
+        $actual = $search->compile();
+        $expected = sprintf( 'SELECT * FROM `articles` LIMIT 5, %d OPTION max_matches=%d', $maxMatches, $maxMatches );
         $this->assertEquals( $expected, $actual );
     }
 }

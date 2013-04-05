@@ -170,6 +170,12 @@ class Miaox_SphinxQl
         return $this;
     }
 
+    public function offset( $offset )
+    {
+        $this->_query->setOffset( $offset );
+        return $this;
+    }
+
     public function compile()
     {
         return $this->_query->compile();
