@@ -68,7 +68,7 @@ class Miaox_SphinxQl
         $msg = sprintf( 'Connected. MultiQuery: %s', $multiQuery ? 'enabled' : 'disabled' );
         $this
             ->getLog()
-            ->debug();
+            ->debug( $msg );
     }
 
     /**
