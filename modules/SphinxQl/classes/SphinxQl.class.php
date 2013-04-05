@@ -214,10 +214,14 @@ class Miaox_SphinxQl
         $this->_queue[ ] = $query;
     }
 
-    public function executeBatch()
+    public function executeBatch( $clearQueue = true )
     {
         $query = implode( ';', $this->_queue );
         $result = $this->_connection->multiQuery( $query );
+        if ( $result && $clearQueue )
+        {
+            $this->_queue = array();
+        }
         return $result;
     }
 
