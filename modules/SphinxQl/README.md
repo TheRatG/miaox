@@ -22,13 +22,13 @@ $port= '4412';
 
 $sphinxql = new Miaox_SphinxQl( $host, $port );
 
-$sphinxql->select()
-  ->from( 'articles', 'articles_delta' )
-	->match( 'body', 'test' )
-	->where( 'is_valid', 1 )
-	->where( 'type', Miaox_SphinxQl::IN, array( 1, 2, 3 ) )
-	->orderBy( 'publish_date' )
-	->limit( 2, 2 );
+$sphinxql->select( '*' )
+    ->from( 'articles', 'articles_delta' )
+    ->match( 'body', 'test' )
+    ->where( 'is_valid', 1 )
+    ->where( 'type', Miaox_SphinxQl::IN, array( 1, 2, 3 ) )
+    ->orderBy( 'publish_date' )
+    ->limit( 2, 2 );
 
 $meta = array();
 $result = $sphinxql->execute( null, $meta );
@@ -37,8 +37,8 @@ $result = $sphinxql->execute( null, $meta );
 Alternative syntax of getting result, but you make two requests to searchd
 
 ```php
-$result = $sphinxql->execute();
-$meta = $sphinxql->meta();
+$result = $sphinxql->execute( 'SELECT * FROM `articles`' );
+$meta = $sphinxql->execute( Miaox_SphinxQl::SHOW_META );
 ```
 
 Or multiquery version with one request to searchd
@@ -46,7 +46,7 @@ Or multiquery version with one request to searchd
 ```php
 $result = array();
 $meta = array();
-$sphinxql->enqueue();
+$sphinxql->enqueue( 'SELECT * FROM `articles`' );
 $sphinxql->enqueue( Miaox_SphinxQl::SHOW_META );
 $resultBatch = $sphinxql->executeBatch();
 if ( $resultBatch && isset( $resultBatch[ 0 ], $resultBatch[ 1 ] ) )
@@ -58,13 +58,12 @@ if ( $resultBatch && isset( $resultBatch[ 0 ], $resultBatch[ 1 ] ) )
 
 
 # Main functions
-* execute( string $query = null )
+* execute() - Execute single query
 
-* enqueue( string $query = null )
-* executeBatch( array $query )
+* enqueue() - Add query to queue
+* executeBatch() - Execute multi query
 
-* callSnippets( array $docs, string $index, string $query, array $opts = array() )
-* describe()
+* callSnippets() - BuildExcerpts text
 
 # Query Builder
 
@@ -76,14 +75,43 @@ http://sphinxsearch.com/docs/2.0.2/sphinxql-select.html
 * from()
 * match()
 * where()
-* whereOpen()
-* whereClose()
 * orderBy()
 * groupBy()
 * withinGroupOrderBy()
 * limit()
 * offset()
 * option()
+
+### Get total count of documents
+
+```php
+//...
+$search
+    ->select( '1 as dummy', 'count(*) as total' )
+    ->from( 'articles', 'articles_delta' )
+    ->groupBy( 'dummy' );
+$result = $search->execute();
+$count = $result[ 0 ][ 'total' ];
+```
+
+### Allocation of matches (buildexcerpts) for a group of documents
+
+```php
+$opts = array(
+    "before_match" => '<span class="mark">',
+    "after_match" => "</span>",
+    "chunk_separator" => " ... ",
+    "limit" => 200,
+    "around" => 10
+);
+$docs = array( 'long body test', 'long body test text 2' );
+$result = $search->callSnippets( $docs, 'articles', 'test', $opts );
+/**
+array(
+    'long body <span class="mark">test</span>',
+);
+*/
+```
 
 ## INSERT
 
