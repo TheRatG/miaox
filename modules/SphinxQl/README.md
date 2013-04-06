@@ -2,8 +2,8 @@
 Query builder module for SphinxQl.
 
 * download [Miaox](https://github.com/TheRatG/miaox/archive/master.zip)
-* unpack and copy direcotry `modules/SphinxQl`, if you don't use miao framework
-* read examples, relax and enjoy
+* unpack and require file `modules/SphinxQl/classes/SphixQl.class.php`
+* read examples, build queries, relax and enjoy
 
 ## Why?
 1. SphinxQl is faster than SphinxAPI, you can check in [SphinxAPI vs SphinxQL benchmark](http://sphinxsearch.com/blog/2010/04/25/sphinxapi-vs-sphinxql-benchmark)
