@@ -79,4 +79,35 @@ class Miaox_SphinxQl_Order_Test extends Miaox_SphinxQl_Helper_Test
         );
         $this->assertEquals( $expected, $actual );
     }
+
+    public function testIssue4()
+    {
+        $search = $this->_sphinxQl;
+        $search
+            ->select( '*', 'weight() as w')
+            ->from( 'articles' )
+            ->match( 'body' )
+            ->where( 'id', Miaox_SphinxQl::IN, array( 1, 2 ) )
+            ->orderBy( 'w' );
+        $actual = $search->execute();
+        $expected = array (
+          0 => 
+          array (
+            'id' => '1',
+            'is_valid' => '1',
+            'publish_date' => '1132223498',
+            'type' => '1',
+            'w' => '1500',
+          ),
+          1 => 
+          array (
+            'id' => '2',
+            'is_valid' => '1',
+            'publish_date' => '1363845000',
+            'type' => '1',
+            'w' => '1500',
+          ),
+        );
+        $this->assertEquals( $expected, $actual );
+    }
 }

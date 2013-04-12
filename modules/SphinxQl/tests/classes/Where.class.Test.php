@@ -20,7 +20,7 @@ class Miaox_SphinxQl_Where_Test extends Miaox_SphinxQl_Helper_Test
             ->from( 'articles' )
             ->where( 'id', 1 );
         $actual = $query->compile();
-        $expected = 'SELECT `id` FROM `articles` WHERE id = 1';
+        $expected = 'SELECT id FROM `articles` WHERE id = 1';
 
         $this->assertEquals( $expected, $actual );
 
@@ -47,7 +47,7 @@ class Miaox_SphinxQl_Where_Test extends Miaox_SphinxQl_Helper_Test
             ->from( 'articles' )
             ->where( 'id', '>=', 1 );
         $actual = $query->compile();
-        $expected = 'SELECT `id` FROM `articles` WHERE id >= 1';
+        $expected = 'SELECT id FROM `articles` WHERE id >= 1';
 
         $this->assertEquals( $expected, $actual );
     }
@@ -70,7 +70,7 @@ class Miaox_SphinxQl_Where_Test extends Miaox_SphinxQl_Helper_Test
                             )
             );
         $actual = $query->compile();
-        $expected = "SELECT `id` FROM `articles` WHERE id IN ( 1, 2, 3 )";
+        $expected = "SELECT id FROM `articles` WHERE id IN ( 1, 2, 3 )";
 
         $this->assertEquals( $expected, $actual );
     }
@@ -92,7 +92,7 @@ class Miaox_SphinxQl_Where_Test extends Miaox_SphinxQl_Helper_Test
                                  )
             );
         $actual = $query->compile();
-        $expected = "SELECT `id` FROM `articles` WHERE id BETWEEN 1 AND 3";
+        $expected = "SELECT id FROM `articles` WHERE id BETWEEN 1 AND 3";
 
         $this->assertEquals( $expected, $actual );
     }

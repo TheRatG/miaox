@@ -199,10 +199,7 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
             foreach ( $this->_attributes as $attribute )
             {
                 $attribute = trim( $attribute );
-                $needQuote = ( false === strpos( $attribute, '(' )
-                    && false === stripos( $attribute, 'AS' )
-                    && $attribute != '*'
-                    && $attribute[ 0 ] !== '@' );
+                $needQuote = $this->_isNeedQuote( $attribute );
                 if ( $needQuote )
                 {
                     $tmp[ ] = sprintf( '`%s`', $attribute );
@@ -294,7 +291,15 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
                 $column = $item[ 'column' ];
                 $direction = $item[ 'direction' ];
 
-                $result[ ] = sprintf( '`%s` %s', $column, $direction );
+                $needQuote = $this->_isNeedQuote( $column );
+                if ( $needQuote )
+                {
+                    $result[ ] = sprintf( '`%s` %s', $column, $direction );
+                }
+                else
+                {
+                    $result[ ] = sprintf( '%s %s', $column, $direction );
+                }                
             }
             $result = implode( ', ', $result );
             $result = 'ORDER BY ' . $result;
@@ -438,4 +443,16 @@ class Miaox_SphinxQl_Query_Select extends Miaox_SphinxQl_Query
         $result = ltrim( $column, '@' );
         return $result;
     }
+
+    protected function _isNeedQuote( $attribute )
+    {
+        $attribute = trim( $attribute );
+        $result = ( false === strpos( $attribute, '(' )
+                    && false === stripos( $attribute, 'AS' )
+                    && $attribute[ 0 ] !== '@'
+                    && !in_array( $attribute, array( '*', 'id', 'weight' ) )
+        );
+        return $result;
+    }
+
 }

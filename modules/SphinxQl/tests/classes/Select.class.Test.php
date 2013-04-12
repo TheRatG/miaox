@@ -67,7 +67,7 @@ class Miaox_SphinxQl_Select_Test extends Miaox_SphinxQl_Helper_Test
             ->select( 'id' )
             ->from( 'articles' )
             ->compile();
-        $expected = 'SELECT `id` FROM `articles`';
+        $expected = 'SELECT id FROM `articles`';
 
         $this->assertEquals( $expected, $actual );
 
