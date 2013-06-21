@@ -149,7 +149,7 @@ class Miaox_SphinxQl_Connection
      */
     public function escape( $value )
     {
-        if ( !$this->isConnected() )
+        if ( !$this->isConnected() || !$this->ping() )
         {
             $this->connect();
         }
@@ -164,13 +164,9 @@ class Miaox_SphinxQl_Connection
 
     protected function _multiQuery( $query )
     {
-        if ( !$this->isConnected() )
+        if ( !$this->isConnected() || !$this->ping() )
         {
             $this->connect();
-        }
-        else
-        {
-            $this->ping();
         }
 
         $this->_driver->multi_query( $query );
