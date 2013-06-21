@@ -6,7 +6,6 @@
 
 require_once realpath( __DIR__ . '/../../' ) . '/Exceptionizer/classes/Exceptionizer.class.php';
 require_once 'Connection/Exception.class.php';
-
 class Miaox_SphinxQl_Connection
 {
     /**
@@ -24,7 +23,6 @@ class Miaox_SphinxQl_Connection
      * @var string Port
      */
     protected $_port;
-
     protected $_multiQuery;
 
     public function __construct( $host, $port, $multiQuery = true )
@@ -99,13 +97,9 @@ class Miaox_SphinxQl_Connection
      */
     public function query( $query )
     {
-        if ( !$this->isConnected() )
+        if ( !$this->isConnected() || !$this->ping() )
         {
             $this->connect();
-        }
-        else
-        {
-            $this->ping();
         }
 
         $resource = $this->_driver->query( $query );
@@ -120,7 +114,7 @@ class Miaox_SphinxQl_Connection
             $rows = array();
             while ( !is_null( $row = $resource->fetch_assoc() ) )
             {
-                $rows[ ] = $row;
+                $rows[] = $row;
             }
             $resource->free_result();
             $result = $rows;
@@ -128,9 +122,7 @@ class Miaox_SphinxQl_Connection
         else
         {
             // sphinxql doesn't return insert_id because we always have to point it out ourselves!
-            $result = array(
-                $this->_driver->affected_rows
-            );
+            $result = array( $this->_driver->affected_rows );
         }
         return $result;
     }
@@ -162,7 +154,7 @@ class Miaox_SphinxQl_Connection
             $this->connect();
         }
 
-        if ( ( $value = $this->_driver->real_escape_string( ( string )$value ) ) === false )
+        if ( ( $value = $this->_driver->real_escape_string( ( string ) $value ) ) === false )
         {
             throw new Miaox_SphinxQl_Connection_Exception( $this->_driver->error, $this->_driver->errno );
         }
@@ -197,15 +189,14 @@ class Miaox_SphinxQl_Connection
 
                 while ( !is_null( $row = $resource->fetch_assoc() ) )
                 {
-                    $result[ $count ][ ] = $row;
+                    $result[ $count ][] = $row;
                 }
 
                 $resource->free_result();
             }
 
             $count++;
-        }
-        while ( $this->_driver->more_results() && $this->_driver->next_result() );
+        } while ( $this->_driver->more_results() && $this->_driver->next_result() );
 
         return $result;
     }
@@ -215,7 +206,7 @@ class Miaox_SphinxQl_Connection
         $result = array();
         $list = explode( ';', $query );
         $list = array_filter( $list );
-        for ( $i = 0, $cnt = count( $list ); $i < $cnt; $i++ )
+        for( $i = 0, $cnt = count( $list ); $i < $cnt; $i++ )
         {
             $result[ $i ] = $this->query( $list[ $i ] );
         }
