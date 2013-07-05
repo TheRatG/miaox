@@ -97,10 +97,7 @@ class Miaox_SphinxQl_Connection
      */
     public function query( $query )
     {
-        if ( !$this->isConnected() || !$this->ping() )
-        {
-            $this->connect();
-        }
+        $this->connect();
 
         $resource = $this->_driver->query( $query );
 
@@ -149,10 +146,7 @@ class Miaox_SphinxQl_Connection
      */
     public function escape( $value )
     {
-        if ( !$this->isConnected() || !$this->ping() )
-        {
-            $this->connect();
-        }
+        $this->connect();
 
         if ( ( $value = $this->_driver->real_escape_string( ( string ) $value ) ) === false )
         {
@@ -164,10 +158,7 @@ class Miaox_SphinxQl_Connection
 
     protected function _multiQuery( $query )
     {
-        if ( !$this->isConnected() || !$this->ping() )
-        {
-            $this->connect();
-        }
+        $this->connect();
 
         $this->_driver->multi_query( $query );
         if ( $this->_driver->error )
