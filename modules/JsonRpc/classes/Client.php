@@ -159,14 +159,20 @@ class Client
             !isset( $p[ 'result' ] ) && $p[ 'result' ] = null;
             !isset( $p[ 'error' ] ) && $p[ 'error' ] = null;
         }
-        $v = $v && array_key_exists( 'result', $p );
-        $v = $v && array_key_exists( 'error', $p );
-        $v = $v && array_key_exists( 'id', $p ) && $p[ 'id' ] == $id;
-        if ( !$v )
+        $requireMap = array('result', 'error', 'id' );
+        $keys = array_keys( $p );
+        $v = array_diff( $requireMap, $keys );
+        if ( !emtpy( $v ) )
         {
-            throw new Exception( 'Invalid Response', -32600 );
+            $msg = sprintf('Invalid Response. Some keys not found (%s)', explode( ', ', $v ) );
+            throw new Exception( $msg, -32600 );
         }
-        if ( isset( $p[ 'error' ] ) )
+        else if ( $p[ 'id' ] != $id )
+        {
+            $msg = sprintf('Invalid Response. Request id (%s) not equal (%s)', $id, $p[ 'id' ] );
+            throw new Exception( $msg, -32500 );
+        }
+        else if ( isset( $p[ 'error' ] ) )
         {
             if ( isset( $p[ 'error' ][ 'message' ] ) && isset( $p[ 'error' ][ 'code' ] ) )
             {
