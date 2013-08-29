@@ -1,4 +1,0 @@
-function goodbay()
-{
-	alert( 'goodbay' );
-};
