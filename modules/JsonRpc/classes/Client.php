@@ -162,7 +162,7 @@ class Client
         $requireMap = array('result', 'error', 'id' );
         $keys = array_keys( $p );
         $v = array_diff( $requireMap, $keys );
-        if ( !emtpy( $v ) )
+        if ( !empty( $v ) )
         {
             $msg = sprintf('Invalid Response. Some keys not found (%s)', explode( ', ', $v ) );
             throw new Exception( $msg, -32600 );
