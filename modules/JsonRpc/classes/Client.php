@@ -96,6 +96,7 @@ class Client
         }
     }
 
+<<<<<<< HEAD
     /**
      * Возвращает коммандную строку вызова метода для дебага
      * @param string $pMethod
@@ -121,6 +122,8 @@ class Client
         return $command;
     }
 
+=======
+>>>>>>> 2de2384ef489f1fe2c6ac4c52e2b52e8c1b8bedb
     public function notify( $pMethod, array $pParams = array() )
     {
         $this->call( $pMethod, $pParams, true );
@@ -184,6 +187,7 @@ class Client
             !isset( $p[ 'result' ] ) && $p[ 'result' ] = null;
             !isset( $p[ 'error' ] ) && $p[ 'error' ] = null;
         }
+<<<<<<< HEAD
         $v = $v && array_key_exists( 'result', $p );
         $v = $v && array_key_exists( 'error', $p );
         $v = $v && array_key_exists( 'id', $p ) && $p[ 'id' ] == $id;
@@ -198,6 +202,26 @@ class Client
                 var_dump($p[ 'error' ]);
                 //throw new Exception( $p[ 'error' ][ 'message' ], $p[ 'error' ][ 'code' ] );
                 throw new Exception( $p[ 'error' ][ 'message' ]);
+=======
+        $requireMap = array('result', 'error', 'id' );
+        $keys = array_keys( $p );
+        $v = array_diff( $requireMap, $keys );
+        if ( !empty( $v ) )
+        {
+            $msg = sprintf('Invalid Response. Some keys not found (%s)', explode( ', ', $v ) );
+            throw new Exception( $msg, -32600 );
+        }
+        else if ( $p[ 'id' ] != $id )
+        {
+            $msg = sprintf('Invalid Response. Request id (%s) not equal (%s)', $id, $p[ 'id' ] );
+            throw new Exception( $msg, -32500 );
+        }
+        else if ( isset( $p[ 'error' ] ) )
+        {
+            if ( isset( $p[ 'error' ][ 'message' ] ) && isset( $p[ 'error' ][ 'code' ] ) )
+            {
+                throw new Exception( $p[ 'error' ][ 'message' ], $p[ 'error' ][ 'code' ] );
+>>>>>>> 2de2384ef489f1fe2c6ac4c52e2b52e8c1b8bedb
             }
             else
             {
