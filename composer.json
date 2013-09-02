@@ -1,0 +1,21 @@
+{
+    "name": "theratg/miaox",
+    "description": "Extension modules for miao",
+    "authors": [
+        {
+            "name": "Vladimir",
+            "email": "TheRatW@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3",
+        "TheRatG/miao": "4.1.*"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "http://github.com/TheRatG/miao"
+        }
+    ]
+}

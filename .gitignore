@@ -1,3 +1,5 @@
 tmp/*
 data/config*
 modules/SphinxQl/tests/data/*
+/vendor/
+composer.lock
