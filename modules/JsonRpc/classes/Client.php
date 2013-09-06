@@ -95,16 +95,37 @@ class Client
             return $response[ 'result' ];
         }
     }
-
+    
+    /**
+     * Возвращает коммандную строку вызова метода для дебага
+     * @param string $pMethod
+     * @param array $pParams
+     * @param bool $pNotify
+     * @return string
+     */
+    public function callDebug($pMethod, array $pParams = array(), $pNotify = false)
+    {
+        $request = array(
+            'method' => $pMethod,
+            'params' => $pParams,
+            'id' => md5( uniqid( null, true ) )
+        );
+        $this->_isExt && $request[ 'jsonrpc' ] = '2.0';
+        $pNotify && $request[ 'id' ] = null;
+        $post = json_encode($request);
+        $auth = '';
+        if (!empty($this->_login)){
+            $auth = sprintf( '--user %s:%s', $this->_login, $this->_password );
+        }
+        $command = sprintf("curl -H 'Content-Type: application/json' -H 'Accept: application/json' -d '%s' %s %s | python -mjson.tool", $post, $auth, $this->_serverUrl);
+        return $command;
+    }
+    
     public function notify( $pMethod, array $pParams = array() )
     {
         $this->call( $pMethod, $pParams, true );
     }
 
-    public function __call( $pMethod, array $pParams )
-    {
-        return $this->call( $pMethod, $pParams, false );
-    }
 
     public function getLastResponse()
     {
