@@ -17,5 +17,10 @@
             "type": "git",
             "url": "http://github.com/TheRatG/miao"
         }
-    ]
+    ],
+    "autoload" : {
+        "classmap" : [
+            "modules"
+        ]
+    }
 }
