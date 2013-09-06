@@ -96,34 +96,6 @@ class Client
         }
     }
 
-<<<<<<< HEAD
-    /**
-     * Возвращает коммандную строку вызова метода для дебага
-     * @param string $pMethod
-     * @param array $pParams
-     * @param bool $pNotify
-     * @return string
-     */
-    public function callDebug($pMethod, array $pParams = array(), $pNotify = false)
-    {
-        $request = array(
-            'method' => $pMethod,
-            'params' => $pParams,
-            'id' => md5( uniqid( null, true ) )
-        );
-        $this->_isExt && $request[ 'jsonrpc' ] = '2.0'; 
-        $pNotify && $request[ 'id' ] = null;
-        $post = json_encode($request);
-        $auth = '';
-        if (!empty($this->_login)){
-            $auth = sprintf( '--user %s:%s', $this->_login, $this->_password );
-        }
-        $command = sprintf("curl -H 'Content-Type: application/json' -H 'Accept: application/json' -d '%s' %s %s | python -mjson.tool", $post, $auth, $this->_serverUrl);
-        return $command;
-    }
-
-=======
->>>>>>> 2de2384ef489f1fe2c6ac4c52e2b52e8c1b8bedb
     public function notify( $pMethod, array $pParams = array() )
     {
         $this->call( $pMethod, $pParams, true );
@@ -187,7 +159,6 @@ class Client
             !isset( $p[ 'result' ] ) && $p[ 'result' ] = null;
             !isset( $p[ 'error' ] ) && $p[ 'error' ] = null;
         }
-<<<<<<< HEAD
         $v = $v && array_key_exists( 'result', $p );
         $v = $v && array_key_exists( 'error', $p );
         $v = $v && array_key_exists( 'id', $p ) && $p[ 'id' ] == $id;
@@ -199,29 +170,7 @@ class Client
         {
             if ( isset( $p[ 'error' ][ 'message' ] ) && isset( $p[ 'error' ][ 'code' ] ) )
             {
-                var_dump($p[ 'error' ]);
-                //throw new Exception( $p[ 'error' ][ 'message' ], $p[ 'error' ][ 'code' ] );
-                throw new Exception( $p[ 'error' ][ 'message' ]);
-=======
-        $requireMap = array('result', 'error', 'id' );
-        $keys = array_keys( $p );
-        $v = array_diff( $requireMap, $keys );
-        if ( !empty( $v ) )
-        {
-            $msg = sprintf('Invalid Response. Some keys not found (%s)', explode( ', ', $v ) );
-            throw new Exception( $msg, -32600 );
-        }
-        else if ( $p[ 'id' ] != $id )
-        {
-            $msg = sprintf('Invalid Response. Request id (%s) not equal (%s)', $id, $p[ 'id' ] );
-            throw new Exception( $msg, -32500 );
-        }
-        else if ( isset( $p[ 'error' ] ) )
-        {
-            if ( isset( $p[ 'error' ][ 'message' ] ) && isset( $p[ 'error' ][ 'code' ] ) )
-            {
                 throw new Exception( $p[ 'error' ][ 'message' ], $p[ 'error' ][ 'code' ] );
->>>>>>> 2de2384ef489f1fe2c6ac4c52e2b52e8c1b8bedb
             }
             else
             {
