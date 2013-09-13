@@ -74,6 +74,14 @@ class Client
         isset( $this->_curl ) && curl_close( $this->_curl );
     }
 
+    /**
+     * @param string $pMethod
+     * @param array $pParams
+     * @param bool $pNotify
+     * @throws Exception
+     * @param bool $pNotify
+     * @return mixed
+     */
     public function call( $pMethod, array $pParams = array(), $pNotify = false )
     {
         if ( is_null( $this->_serverUrl ) )
@@ -87,15 +95,25 @@ class Client
         );
         $this->_isExt && $request[ 'jsonrpc' ] = '2.0';
         $pNotify && $request[ 'id' ] = null;
-        $this->_lastResponse = $response = $this->_postQuery( json_encode( $request ) );
-        if ( !$pNotify )
+        try
         {
-            $response = $this->_parseJson( $response );
-            $this->_checkResponse( $response, $request[ 'id' ] );
-            return $response[ 'result' ];
+            $this->_lastResponse = $json = $this->_postQuery( json_encode( $request ) );
+            if ( !$pNotify )
+            {
+                $response = $this->_parseJson( $json );
+                $this->_checkResponse( $response, $request[ 'id' ] );
+                return $response[ 'result' ];
+            }
+        }
+        catch ( Exception $e )
+        {
+            // hardcore :-)
+            $e->setDebugCommand($this->callDebug($pMethod, $pParams, $pNotify));
+            $e->setResponse($json);
+            throw $e;
         }
     }
-    
+
     /**
      * Возвращает коммандную строку вызова метода для дебага
      * @param string $pMethod
@@ -103,7 +121,7 @@ class Client
      * @param bool $pNotify
      * @return string
      */
-    public function callDebug($pMethod, array $pParams = array(), $pNotify = false)
+    public function callDebug( $pMethod, array $pParams = array(), $pNotify = false )
     {
         $request = array(
             'method' => $pMethod,
@@ -112,20 +130,20 @@ class Client
         );
         $this->_isExt && $request[ 'jsonrpc' ] = '2.0';
         $pNotify && $request[ 'id' ] = null;
-        $post = json_encode($request);
+        $post = json_encode( $request );
         $auth = '';
-        if (!empty($this->_login)){
+        if ( !empty( $this->_login ) )
+        {
             $auth = sprintf( '--user %s:%s', $this->_login, $this->_password );
         }
-        $command = sprintf("curl -H 'Content-Type: application/json' -H 'Accept: application/json' -d '%s' %s %s | python -mjson.tool", $post, $auth, $this->_serverUrl);
+        $command = sprintf( "curl -H 'Content-Type: application/json' -H 'Accept: application/json' -d '%s' %s %s | python -mjson.tool", $post, $auth, $this->_serverUrl );
         return $command;
     }
-    
+
     public function notify( $pMethod, array $pParams = array() )
     {
         $this->call( $pMethod, $pParams, true );
     }
-
 
     public function getLastResponse()
     {
@@ -180,22 +198,29 @@ class Client
             !isset( $p[ 'result' ] ) && $p[ 'result' ] = null;
             !isset( $p[ 'error' ] ) && $p[ 'error' ] = null;
         }
-        $v = $v && array_key_exists( 'result', $p );
-        $v = $v && array_key_exists( 'error', $p );
-        $v = $v && array_key_exists( 'id', $p ) && $p[ 'id' ] == $id;
-        if ( !$v )
+        $requireMap = array( 'result', 'error', 'id' );
+        $keys = array_keys( $p );
+        $v = array_diff( $requireMap, $keys );
+        if ( !empty( $v ) )
         {
-            throw new Exception( 'Invalid Response', -32600 );
+            $msg = sprintf( 'Invalid Response. Some keys not found (%s)', explode( ', ', $v ) );
+            throw new Exception( $msg, -32600 );
         }
+        elseif ( $p[ 'id' ] != $id )
+        {
+            $msg = sprintf( 'Invalid Response. Request id (%s) not equal (%s)', $id, $p[ 'id' ] );
+            throw new Exception( $msg, -32500 );
+        }
+
         if ( isset( $p[ 'error' ] ) )
         {
-            if ( isset( $p[ 'error' ][ 'message' ] ) && isset( $p[ 'error' ][ 'code' ] ) )
+            if ( isset( $p[ 'error' ][ 'message' ] ) && isset( $p[ 'error' ][ 'code' ] ) && is_numeric( $p[ 'error' ][ 'code' ] ) )
             {
                 throw new Exception( $p[ 'error' ][ 'message' ], $p[ 'error' ][ 'code' ] );
             }
             else
             {
-                throw new Exception( $p[ 'error' ] );
+                throw new Exception( $p[ 'error' ][ 'message' ] );
             }
         }
     }
