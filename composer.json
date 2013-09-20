@@ -1,5 +1,7 @@
 {
     "name": "theratg/miaox",
+    "version": "4.1.0-dev",
+    "license": "BSD-4-Clause",
     "description": "Extension modules for miao",
     "authors": [
         {
@@ -11,6 +13,9 @@
     "require": {
         "php": ">=5.3",
         "TheRatG/miao": "4.1.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
     },
     "repositories": [
         {
