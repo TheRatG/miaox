@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 data/config*
 scripts/miao.php
 modules/Env/data/*
 /tmp/
 composer.lock
 /vendor/
+=======
+tmp/*
+data/config*
+modules/SphinxQl/tests/data/*
+>>>>>>> 4ba4b831f7929f9b81d91f727af7913aff9284b7

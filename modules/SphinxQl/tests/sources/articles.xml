@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sphinx:docset>
+
+    <sphinx:schema>
+        <sphinx:field name="title" />
+        <sphinx:field name="body" />
+        <sphinx:field name="tags" />
+        <sphinx:attr name="is_valid" type="bool" />
+        <sphinx:attr
+                name="publish_date"
+                type="timestamp" />
+        <sphinx:attr
+                name="type"
+                type="int"
+                bits="16"
+                default="1" />
+    </sphinx:schema>
+
+    <sphinx:document id="1">
+        <title>article 1</title>
+        <body>this is body 1 test</body>
+        <tags>555</tags>
+        <is_valid>1</is_valid>
+        <publish_date>1132223498</publish_date>
+        <type>1</type>
+    </sphinx:document>
+
+    <sphinx:document id="2">
+        <title>article 2</title>
+        <body>this is body 2</body>
+        <tags>666</tags>
+        <is_valid>1</is_valid>
+        <publish_date>1363845000</publish_date>
+        <type>1</type>
+    </sphinx:document>
+
+    <sphinx:document id="3">
+        <title>article 3</title>
+        <body>this is body 3</body>
+        <tags>777</tags>
+        <is_valid>1</is_valid>
+        <publish_date>1363931400</publish_date>
+        <type>1</type>
+    </sphinx:document>
+
+    <sphinx:document id="4">
+        <title>article 4</title>
+        <body>this is body 4</body>
+        <tags>666 777</tags>
+        <is_valid>1</is_valid>
+        <publish_date>1364017800</publish_date>
+        <type>2</type>
+    </sphinx:document>
+
+    <sphinx:document id="5">
+        <title>article 5</title>
+        <body>Something is cost $200</body>
+        <tags>888</tags>
+        <is_valid>1</is_valid>
+        <publish_date>1364107800</publish_date>
+        <type>3</type>
+    </sphinx:document>
+
+    <sphinx:document id="6">
+        <title>OneWordTitle</title>
+        <body>This is test search with special char</body>
+        <tags>999</tags>
+        <is_valid>1</is_valid>
+        <publish_date>1364194200</publish_date>
+        <type>4</type>
+    </sphinx:document>
+
+    <sphinx:document id="7">
+        <title>OneWordTitle No</title>
+        <body>This is test search with special char</body>
+        <tags>999</tags>
+        <is_valid>1</is_valid>
+        <publish_date>1364197800</publish_date>
+        <type>4</type>
+    </sphinx:document>
+
+</sphinx:docset>
