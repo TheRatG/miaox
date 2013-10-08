@@ -8,24 +8,10 @@ namespace Miaox\JsonRpc;
 
 class Client
 {
-    const VERSION_1_0 = 10;
-
-    const VERSION_2_0 = 20;
-
     /**
      * @var string
      */
     protected $_serverUrl;
-
-    /**
-     * @var int
-     */
-    protected $_version;
-
-    /**
-     * @var bool
-     */
-    protected $_isExt;
 
     /**
      * @var resource
@@ -57,16 +43,21 @@ class Client
      */
     protected $_timeout = 5;
 
-    public function __construct( $serverUrl, $pVersion = self::VERSION_2_0 )
+    /**
+     * If true using multiple requests
+     * @var bool
+     */
+    protected $_multi = false;
+
+    /**
+     * Запросы
+     * @var array
+     */
+    protected $_requests = array();
+
+    public function __construct( $serverUrl )
     {
         $this->_serverUrl = $serverUrl;
-
-        if ( !in_array( $pVersion, array( self::VERSION_1_0, self::VERSION_2_0 ) ) )
-        {
-            throw new Exception( 'Invalid protocol version' );
-        }
-        $this->_version = $pVersion;
-        $this->_isExt = $this->_version == self::VERSION_2_0;
     }
 
     public function __destruct()
@@ -77,72 +68,58 @@ class Client
     /**
      * @param string $pMethod
      * @param array $pParams
-     * @param bool $pNotify
+     * @param string|null $id
      * @throws Exception
-     * @param bool $pNotify
-     * @return mixed
+     * @return array
      */
-    public function call( $pMethod, array $pParams = array(), $pNotify = false )
+    public function call( $pMethod, array $pParams = array(), $id = null )
     {
-        if ( is_null( $this->_serverUrl ) )
+        $request = $this->_formatRequest( $pMethod, $pParams, $id );
+        if ( $this->_multi )
         {
-            throw new Exception( 'This is server JSON-RPC object: you can\'t call remote methods' );
-        }
-        $request = array(
-            'method' => $pMethod,
-            'params' => $pParams,
-            'id' => md5( uniqid( null, true ) )
-        );
-        $this->_isExt && $request[ 'jsonrpc' ] = '2.0';
-        $pNotify && $request[ 'id' ] = null;
-        try
-        {
-            $this->_lastResponse = $json = $this->_postQuery( json_encode( $request ) );
-            if ( !$pNotify )
+            $id = $request[ 'id' ];
+            if ( !empty( $this->_requests[ $request[ 'id' ] ] ) )
             {
+                throw new Exception( sprintf( "Method with the id = '%s' already exist", $id ) );
+            }
+            $this->_requests[ $id ] = $request;
+        }
+        else
+        {
+            try
+            {
+                $this->_lastResponse = $json = $this->_postQuery( json_encode( $request ) );
                 $response = $this->_parseJson( $json );
                 $this->_checkResponse( $response, $request[ 'id' ] );
                 return $response[ 'result' ];
             }
-        }
-        catch ( Exception $e )
-        {
-            // hardcore :-)
-            $e->setDebugCommand($this->callDebug($pMethod, $pParams, $pNotify));
-            $e->setResponse($json);
-            throw $e;
+            catch ( Exception $e )
+            {
+                // hardcore :-)
+                $e->setDebugCommand( $this->callDebug( $pMethod, $pParams, $pNotify ) );
+                $e->setResponse( $json );
+                throw $e;
+            }
         }
     }
 
     /**
-     * Возвращает коммандную строку вызова метода для дебага
+     * Returns a unix command for debugging
      * @param string $pMethod
      * @param array $pParams
      * @param bool $pNotify
      * @return string
      */
-    public function callDebug( $pMethod, array $pParams = array(), $pNotify = false )
+    public function callDebug( $pMethod, array $pParams = array(), $id = null )
     {
-        $request = array(
-            'method' => $pMethod,
-            'params' => $pParams,
-            'id' => md5( uniqid( null, true ) )
-        );
-        $this->_isExt && $request[ 'jsonrpc' ] = '2.0';
-        $pNotify && $request[ 'id' ] = null;
-        $post = json_encode( $request );
-        $auth = '';
-        if ( !empty( $this->_login ) )
-        {
-            $auth = sprintf( '--user %s:%s', $this->_login, $this->_password );
-        }
-        $command = sprintf( "curl -H 'Content-Type: application/json' -H 'Accept: application/json' -d '%s' %s %s | python -mjson.tool", $post, $auth, $this->_serverUrl );
-        return $command;
+        $request = $this->_formatRequest( $pMethod, $pParams, $id );
+        return $this->_postQueryDebug( json_encode( $request ) );
     }
 
     public function notify( $pMethod, array $pParams = array() )
     {
-        $this->call( $pMethod, $pParams, true );
+        $request = $this->_formatRequest($pMethod, $pParams, null);
+        $this->_postQuery(json_encode($request));
     }
 
     public function getLastResponse()
@@ -150,16 +127,99 @@ class Client
         return $this->_lastResponse;
     }
 
+    /**
+     * @param int $timeout
+     */
+    public function setTimeout( $timeout )
+    {
+        $this->_timeout = $timeout;
+    }
+
+    /**
+     * Авторизация
+     * @param string $login логи
+     * @param string $password пароль
+     * @param int $type тип авторизации
+     */
+    public function setAuthInfo( $login, $password, $type = CURLAUTH_BASIC )
+    {
+        $this->_login = $login;
+        $this->_password = $password;
+        $this->_authType = $type;
+    }
+
+    public function startBatch()
+    {
+        $this->resetBatch();
+        $this->_multi = true;
+    }
+
+    public function resetBatch()
+    {
+        $this->_multi = false;
+        $this->_requests = array();
+    }
+
+    public function sendBatch()
+    {
+        if ( !$this->_multi )
+        {
+            throw new Exception( "You need to call startBatch before using this method" );
+        }
+
+        if ( empty( $this->_requests ) )
+        {
+            throw new Exception( "Empty batch" );
+        }
+
+        $requests = array_values( $this->_requests );
+        $this->_lastResponse = $json = $this->_postQuery( json_encode( $requests ) );
+        $response = $this->_parseJson( $json );
+        $ret = array();
+        for ( $i = 0; $i < count( $requests ); $i++ )
+        {
+            $request = $requests[ $i ];
+            try
+            {
+                $this->_checkResponse( $response[ $i ], $request[ 'id' ] );
+                $ret[ $request[ 'id' ] ] = $this->_parseJson($response[ $i ][ 'result' ]);
+            }
+            catch ( Exception $e )
+            {
+                $e->setDebugCommand($this->_postQueryDebug(json_encode($requests)));
+                $e->setResponse($this->_lastResponse);
+                $ret[ $request[ 'id' ] ] = $e;
+            }
+        }
+        return $ret;
+    }
+
+    protected function _formatRequest( $method, $params, $id )
+    {
+        if ( empty( $id ) )
+        {
+            $id = md5( uniqid( null, true ) );
+        }
+        $request = array(
+            'method' => $method,
+            'params' => $params,
+            'id' => $id,
+            'jsonrpc' => '2.0'
+        );
+        return $request;
+    }
+
     protected function _postQuery( $pQuery )
     {
         $ch = isset( $this->_curl ) ? $this->_curl : curl_init();
+        $header = array();
         $options = array(
             CURLOPT_URL => $this->_serverUrl,
             CURLOPT_HEADER => 0,
             CURLOPT_POST => 1,
             CURLOPT_POSTFIELDS => $pQuery,
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_TIMEOUT => $this->_timeout
+            CURLOPT_TIMEOUT => $this->_timeout,
         );
         if ( !empty ( $this->_login ) )
         {
@@ -176,7 +236,22 @@ class Client
         {
             throw new Exception( sprintf( 'Curl response http error code "%s"', curl_getinfo( $ch, CURLINFO_HTTP_CODE ) ) );
         }
+        if ( empty( $this->_curl ) )
+        {
+            $this->_curl = $ch;
+        }
         return $response_json;
+    }
+
+    protected function _postQueryDebug( $query )
+    {
+        $auth = '';
+        if ( !empty( $this->_login ) )
+        {
+            $auth = sprintf( '--user %s:%s', $this->_login, $this->_password );
+        }
+        $command = sprintf( "curl -H 'Content-Type: application/json' -H 'Accept: application/json' -d '%s' %s %s | python -mjson.tool", $query, $auth, $this->_serverUrl );
+        return $command;
     }
 
     protected function _parseJson( $pData )
@@ -192,12 +267,10 @@ class Client
     protected function _checkResponse( $p, $id )
     {
         $v = is_array( $p );
-        if ( $this->_isExt )
-        {
-            $v = $v && isset( $p[ 'jsonrpc' ] ) && $p[ 'jsonrpc' ] == '2.0';
-            !isset( $p[ 'result' ] ) && $p[ 'result' ] = null;
-            !isset( $p[ 'error' ] ) && $p[ 'error' ] = null;
-        }
+        $v = $v && isset( $p[ 'jsonrpc' ] ) && $p[ 'jsonrpc' ] == '2.0';
+        !isset( $p[ 'result' ] ) && $p[ 'result' ] = null;
+        !isset( $p[ 'error' ] ) && $p[ 'error' ] = null;
+
         $requireMap = array( 'result', 'error', 'id' );
         $keys = array_keys( $p );
         $v = array_diff( $requireMap, $keys );
@@ -223,26 +296,5 @@ class Client
                 throw new Exception( $p[ 'error' ][ 'message' ] );
             }
         }
-    }
-
-    /**
-     * @param int $timeout
-     */
-    public function setTimeout( $timeout )
-    {
-        $this->_timeout = $timeout;
-    }
-
-    /**
-     * Авторизация
-     * @param string $login логи
-     * @param string $password пароль
-     * @param int $type тип авторизации
-     */
-    public function setAuthInfo( $login, $password, $type = CURLAUTH_BASIC )
-    {
-        $this->_login = $login;
-        $this->_password = $password;
-        $this->_authType = $type;
     }
 }
