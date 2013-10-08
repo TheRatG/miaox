@@ -160,7 +160,7 @@ class Client
         $this->_requests = array();
     }
 
-    public function sendBatch()
+    public function callBatch()
     {
         if ( !$this->_multi )
         {
@@ -182,7 +182,7 @@ class Client
             try
             {
                 $this->_checkResponse( $response[ $i ], $request[ 'id' ] );
-                $ret[ $request[ 'id' ] ] = $this->_parseJson($response[ $i ][ 'result' ]);
+                $ret[ $request[ 'id' ] ] = $response[ $i ][ 'result' ];
             }
             catch ( Exception $e )
             {
