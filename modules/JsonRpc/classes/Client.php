@@ -66,11 +66,13 @@ class Client
     }
 
     /**
+     * Returns request result or null if it's batch request
+     *
      * @param string $pMethod
      * @param array $pParams
      * @param string|null $id
      * @throws Exception
-     * @return array
+     * @return array|null
      */
     public function call( $pMethod, array $pParams = array(), $id = null )
     {
@@ -83,6 +85,7 @@ class Client
                 throw new Exception( sprintf( "Method with the id = '%s' already exist", $id ) );
             }
             $this->_requests[ $id ] = $request;
+            return null;
         }
         else
         {
@@ -96,7 +99,7 @@ class Client
             catch ( Exception $e )
             {
                 // hardcore :-)
-                $e->setDebugCommand( $this->callDebug( $pMethod, $pParams, $pNotify ) );
+                $e->setDebugCommand( $this->callDebug( $pMethod, $pParams ) );
                 $e->setResponse( $json );
                 throw $e;
             }
@@ -160,6 +163,11 @@ class Client
         $this->_requests = array();
     }
 
+    public function isMulti()
+    {
+        return $this->_multi;
+    }
+
     public function callBatch()
     {
         if ( !$this->_multi )
@@ -191,6 +199,7 @@ class Client
                 $ret[ $request[ 'id' ] ] = $e;
             }
         }
+        $this->resetBatch();
         return $ret;
     }
 
